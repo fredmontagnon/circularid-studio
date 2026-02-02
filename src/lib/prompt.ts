@@ -32,7 +32,7 @@ export function buildExtractionPrompt(rawInput: string): string {
    - \`statement_5032_closed_loop\`: true only if the product is mono-material or explicitly designed for fiber-to-fiber recycling.
 
 7. **Scoring Rules:**
-   - \`data_completeness_score\`: Count non-null extracted fields / total extractable fields × 100. Key fields: name, gtin, sku, weaving_country, dyeing_country, manufacturing_country, synthetic_percentage, recycled_percentage, svhc status.
+   - \`data_completeness_score\`: Count non-null extracted fields / total extractable fields * 100. Key fields: name, gtin, sku, weaving_country, dyeing_country, manufacturing_country, synthetic_percentage, recycled_percentage, svhc status.
    - \`circularity_performance_score\`: Weighted score:
      * Recycled content >25% = +25pts
      * is_majority_recyclable = true = +25pts
@@ -42,10 +42,57 @@ export function buildExtractionPrompt(rawInput: string): string {
 
 8. **Gap Analysis:** For every \`null\` field or compliance gap, generate ONE specific advice string. Format: "Missing [Field Name]: [Specific action to achieve compliance]"
 
+## EXACT OUTPUT JSON SCHEMA — You MUST return this exact structure:
+
+{
+  "product_identity": {
+    "name": "String",
+    "gtin": "String or null",
+    "sku": "String or null"
+  },
+  "agec_compliance": {
+    "traceability": {
+      "weaving_knitting_country": "ISO 3166-1 alpha-2 or null",
+      "dyeing_printing_country": "ISO 3166-1 alpha-2 or null",
+      "manufacturing_country": "ISO 3166-1 alpha-2 or null"
+    },
+    "recyclability": {
+      "is_majority_recyclable": false,
+      "blockers": ["list of blocker strings"]
+    },
+    "material_analysis": {
+      "synthetic_fiber_percentage": 0,
+      "microplastic_warning_required": false,
+      "recycled_content_percentage": 0
+    },
+    "hazardous_substances": {
+      "contains_svhc": false,
+      "substance_names": ["list of substance strings"]
+    }
+  },
+  "iso_59040_pcds": {
+    "section_2_inputs": {
+      "statement_2503_post_consumer": false,
+      "statement_2301_reach_compliant": false
+    },
+    "section_3_better_use": {
+      "statement_3000_repairable": false
+    },
+    "section_5_end_of_life": {
+      "statement_5032_closed_loop": false
+    }
+  },
+  "meta_scoring": {
+    "data_completeness_score": 0,
+    "circularity_performance_score": 0,
+    "gap_analysis_advice": ["list of advice strings"]
+  }
+}
+
 ## INPUT TO ANALYZE:
 \`\`\`
 ${rawInput}
 \`\`\`
 
-Extract and return the compliance data as structured JSON matching the schema exactly.`;
+Return ONLY the JSON object with the exact structure above. No markdown, no code fences, no explanation.`;
 }
