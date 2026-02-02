@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
   FileText,
@@ -81,19 +80,9 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full max-w-3xl mx-auto"
-    >
+    <div className="w-full max-w-3xl mx-auto">
       {/* Header */}
-      <motion.div
-        className="text-center mb-8"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
+      <div className="text-center mb-8">
         <h1 className="text-4xl font-bold tracking-tight mb-3">
           <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent">
             CircularID
@@ -104,10 +93,10 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
           Drop any textile data — supplier emails, PDF content, raw descriptions
           — and watch it transform into dual-compliance structured data.
         </p>
-      </motion.div>
+      </div>
 
       {/* Dropzone Area */}
-      <motion.div
+      <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -116,7 +105,6 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
             ? "glass-strong glow-cyan scale-[1.02]"
             : "glass hover:border-cyan-500/20"
         }`}
-        whileHover={{ borderColor: "rgba(0, 240, 255, 0.2)" }}
       >
         {/* Animated border gradient */}
         <div
@@ -135,19 +123,17 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
             <textarea
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Paste your textile product data here...&#10;&#10;Examples:&#10;• Supplier email content&#10;• PDF text extraction&#10;• Raw product descriptions&#10;• Material composition sheets"
+              placeholder={"Paste your textile product data here...\n\nExamples:\n\u2022 Supplier email content\n\u2022 PDF text extraction\n\u2022 Raw product descriptions\n\u2022 Material composition sheets"}
               className="w-full h-48 bg-transparent border-0 text-white/90 placeholder-white/20 resize-none focus:outline-none focus:ring-0 text-sm font-mono leading-relaxed"
               disabled={isLoading}
             />
             {textInput && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
+              <button
                 onClick={clearInput}
                 className="absolute top-0 right-0 p-1 text-white/30 hover:text-white/60 transition-colors"
               >
                 <X size={16} />
-              </motion.button>
+              </button>
             )}
           </div>
 
@@ -191,16 +177,10 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
             />
 
             {fileName && (
-              <AnimatePresence>
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="text-xs text-cyan-400/60 flex items-center gap-1"
-                >
-                  <FileText size={12} />
-                  {fileName}
-                </motion.span>
-              </AnimatePresence>
+              <span className="text-xs text-cyan-400/60 flex items-center gap-1">
+                <FileText size={12} />
+                {fileName}
+              </span>
             )}
 
             {/* Submit Button */}
@@ -210,55 +190,27 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
                 disabled={!textInput.trim() || isLoading}
                 className="gap-2 relative overflow-hidden"
               >
-                <AnimatePresence mode="wait">
-                  {isLoading ? (
-                    <motion.div
-                      key="loading"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex items-center gap-2"
-                    >
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                      >
-                        <Sparkles size={14} />
-                      </motion.div>
-                      Analyzing...
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="idle"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex items-center gap-2"
-                    >
-                      <Upload size={14} />
-                      Analyze
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={14} className="animate-spin" />
+                    Analyzing...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Upload size={14} />
+                    Analyze
+                  </div>
+                )}
               </Button>
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Hint */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        className="text-center text-white/15 text-xs mt-4"
-      >
+      <p className="text-center text-white/15 text-xs mt-4">
         Powered by Claude AI — ISO 59040 + AGEC dual-compliance engine
-      </motion.p>
-    </motion.div>
+      </p>
+    </div>
   );
 }

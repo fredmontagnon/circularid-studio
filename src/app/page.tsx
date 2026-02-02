@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { MagicDropzone } from "@/components/dropzone/MagicDropzone";
 import { ScanningAnimation } from "@/components/scanning/ScanningAnimation";
 import { Dashboard } from "@/components/dashboard/Dashboard";
@@ -67,50 +67,36 @@ export default function Home() {
 
       {/* Content */}
       <div className="relative z-10">
-        <AnimatePresence mode="wait">
-          {appState === "input" && (
-            <motion.div
-              key="input"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex items-center justify-center min-h-screen px-4"
-            >
-              <div className="w-full">
-                <MagicDropzone
-                  onSubmit={handleSubmit}
-                  isLoading={false}
-                />
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="max-w-3xl mx-auto mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-sm text-center"
-                  >
-                    {error}
-                  </motion.div>
-                )}
-              </div>
-            </motion.div>
-          )}
-
-          {appState === "dashboard" && complianceData && (
-            <motion.div
-              key="dashboard"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="py-8"
-            >
-              <Dashboard
-                data={complianceData}
-                rawInput={rawInput}
-                onReset={handleReset}
+        {appState === "input" && (
+          <div className="flex items-center justify-center min-h-screen px-4">
+            <div className="w-full">
+              <MagicDropzone
+                onSubmit={handleSubmit}
+                isLoading={false}
               />
-            </motion.div>
-          )}
-        </AnimatePresence>
+              {error && (
+                <div className="max-w-3xl mx-auto mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-sm text-center">
+                  {error}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {appState === "dashboard" && complianceData && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="py-8"
+          >
+            <Dashboard
+              data={complianceData}
+              rawInput={rawInput}
+              onReset={handleReset}
+            />
+          </motion.div>
+        )}
       </div>
     </main>
   );
