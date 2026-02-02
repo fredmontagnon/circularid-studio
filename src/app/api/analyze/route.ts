@@ -1,16 +1,11 @@
-import { generateText } from "ai";
-import { createAnthropic } from "@ai-sdk/anthropic";
 import { buildExtractionPrompt } from "@/lib/prompt";
 
 export const maxDuration = 60;
 
-const anthropic = createAnthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
 export async function POST(req: Request) {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
       return Response.json(
         { error: "ANTHROPIC_API_KEY is not configured" },
         { status: 500 }
@@ -28,13 +23,38 @@ export async function POST(req: Request) {
 
     const prompt = buildExtractionPrompt(input.trim());
 
-    const { text } = await generateText({
-      model: anthropic("claude-3-5-sonnet-latest"),
-      prompt: prompt + "\n\nRespond ONLY with valid JSON. No markdown, no code fences, no explanation. Just the JSON object.",
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-3-5-sonnet-latest",
+        max_tokens: 4096,
+        messages: [
+          {
+            role: "user",
+            content: prompt + "\n\nRespond ONLY with valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.",
+          },
+        ],
+      }),
     });
 
-    // Extract JSON from the response (handle potential markdown code fences)
-    let jsonStr = text.trim();
+    if (!response.ok) {
+      const errorBody = await response.text();
+      return Response.json(
+        { error: "Anthropic API error", details: errorBody },
+        { status: response.status }
+      );
+    }
+
+    const result = await response.json();
+    const textContent = result.content?.[0]?.text || "";
+
+    // Extract JSON from the response
+    let jsonStr = textContent.trim();
     if (jsonStr.startsWith("```")) {
       jsonStr = jsonStr.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
     }
@@ -49,16 +69,9 @@ export async function POST(req: Request) {
   } catch (error: unknown) {
     console.error("Analysis error:", error);
     const message =
-      error instanceof Error
-        ? error.message + (error.cause ? ` | cause: ${JSON.stringify(error.cause)}` : "")
-        : typeof error === "object" && error !== null
-        ? JSON.stringify(error)
-        : String(error);
+      error instanceof Error ? error.message : String(error);
     return Response.json(
-      {
-        error: "Failed to analyze input",
-        details: message,
-      },
+      { error: "Failed to analyze input", details: message },
       { status: 500 }
     );
   }
