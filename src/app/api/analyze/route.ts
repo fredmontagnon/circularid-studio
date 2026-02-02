@@ -1,6 +1,5 @@
-import { generateObject } from "ai";
+import { generateText } from "ai";
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { complianceDataSchema } from "@/lib/schema";
 import { buildExtractionPrompt } from "@/lib/prompt";
 
 export const maxDuration = 60;
@@ -29,22 +28,29 @@ export async function POST(req: Request) {
 
     const prompt = buildExtractionPrompt(input.trim());
 
-    const { object } = await generateObject({
+    const { text } = await generateText({
       model: anthropic("claude-3-5-sonnet-latest"),
-      schema: complianceDataSchema,
-      prompt,
+      prompt: prompt + "\n\nRespond ONLY with valid JSON. No markdown, no code fences, no explanation. Just the JSON object.",
     });
+
+    // Extract JSON from the response (handle potential markdown code fences)
+    let jsonStr = text.trim();
+    if (jsonStr.startsWith("```")) {
+      jsonStr = jsonStr.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+    }
+
+    const data = JSON.parse(jsonStr);
 
     return Response.json({
       success: true,
-      data: object,
+      data,
       raw_input: input.trim(),
     });
   } catch (error: unknown) {
-    console.error("Analysis error:", JSON.stringify(error, Object.getOwnPropertyNames(error as object)));
+    console.error("Analysis error:", error);
     const message =
       error instanceof Error
-        ? error.message
+        ? error.message + (error.cause ? ` | cause: ${JSON.stringify(error.cause)}` : "")
         : typeof error === "object" && error !== null
         ? JSON.stringify(error)
         : String(error);
