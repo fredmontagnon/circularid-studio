@@ -30,10 +30,9 @@ export async function POST(req: Request) {
     const prompt = buildExtractionPrompt(input.trim());
 
     const { object } = await generateObject({
-      model: anthropic("claude-3-5-sonnet-20241022"),
+      model: anthropic("claude-3-5-sonnet-latest"),
       schema: complianceDataSchema,
       prompt,
-      temperature: 0.1,
     });
 
     return Response.json({
