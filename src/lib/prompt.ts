@@ -40,7 +40,21 @@ export function buildExtractionPrompt(rawInput: string): string {
      * All 3 traceability countries known = +15pts
      * Closed-loop design = +15pts
 
-8. **Gap Analysis:** For every \`null\` field or compliance gap, generate ONE specific advice string. Format: "Missing [Field Name]: [Specific action to achieve compliance]"
+8. **Gap Analysis — ENRICHED ACTIONABLE ADVICE:**
+   For every \`null\` field or compliance gap, generate ONE **detailed, precise** advice string. Each advice MUST follow this enriched format:
+
+   **Format:** "Missing [Field Name]: [Problem description]. ACTION: [Precise step-by-step remedy with specific details]"
+
+   **Rules for enriched advice:**
+   - For missing traceability countries: specify which supply chain actor to contact (weaver, dyer, CMT factory), what document to request (e.g., "Request a Certificate of Origin or manufacturing declaration from your Tier 2 supplier"), and reference the AGEC Décret 2022-748.
+   - For recyclability blockers: explain exactly which material or component is blocking, what the threshold is, and what alternative material/design could resolve it (e.g., "Replace elastane (currently 5%) with a biodegradable stretch alternative like Roica V550 to stay below the 3% threshold, or redesign with mechanical stretch construction").
+   - For SVHC/hazardous substance issues: name the specific substance detected, reference ECHA Candidate List, and suggest certified alternatives (e.g., "Nickel detected in metal zippers — switch to YKK Natulon or coil zippers with OEKO-TEX certification to eliminate nickel exposure").
+   - For missing recycled content: recommend specific certifications to obtain (GRS — Global Recycled Standard, RCS — Recycled Claim Standard), suggest recycled fiber suppliers (e.g., Repreve, Econyl, Renewcell), and note the >25% threshold for ISO 59040 Statement 2503.
+   - For repairability gaps: suggest specific design modifications (modular button attachments, accessible seam construction, snap-in zipper modules, including repair instructions with product).
+   - For closed-loop/mono-material gaps: explain fiber-to-fiber recycling requirements, suggest mono-material alternatives (100% cotton, 100% polyester, 100% wool), and reference existing recycling infrastructure (Worn Again, Renewcell Circulose, Eastman Naia).
+   - For missing GTIN/SKU: explain that GS1 registration is needed, reference the GS1 France portal for French market, and note this is mandatory for AGEC product identification.
+   - Always estimate the compliance impact: e.g., "Resolving this would add +15 points to your circularity score" or "This is required for AGEC Article 13 compliance".
+   - Keep each advice actionable and self-contained — the user should be able to act on it immediately without further research.
 
 ## EXACT OUTPUT JSON SCHEMA — You MUST return this exact structure:
 

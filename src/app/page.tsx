@@ -9,6 +9,12 @@ import type { ComplianceData } from "@/lib/schema";
 
 type AppState = "input" | "scanning" | "dashboard";
 
+export interface ProductHistoryEntry {
+  data: ComplianceData;
+  rawInput: string;
+  timestamp: Date;
+}
+
 export default function Home() {
   const [appState, setAppState] = useState<AppState>("input");
   const [complianceData, setComplianceData] = useState<ComplianceData | null>(
@@ -16,6 +22,7 @@ export default function Home() {
   );
   const [rawInput, setRawInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [productHistory, setProductHistory] = useState<ProductHistoryEntry[]>([]);
 
   const handleSubmit = useCallback(async (input: string) => {
     setRawInput(input);
@@ -40,6 +47,10 @@ export default function Home() {
       await new Promise((resolve) => setTimeout(resolve, 8000));
 
       setComplianceData(result.data);
+      setProductHistory((prev) => [
+        ...prev,
+        { data: result.data, rawInput: input, timestamp: new Date() },
+      ]);
       setAppState("dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -94,6 +105,7 @@ export default function Home() {
               data={complianceData}
               rawInput={rawInput}
               onReset={handleReset}
+              productHistory={productHistory}
             />
           </motion.div>
         )}

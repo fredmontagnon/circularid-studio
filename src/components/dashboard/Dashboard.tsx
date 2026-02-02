@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -8,22 +9,31 @@ import { ScoreRing } from "./ScoreRing";
 import { AGECView } from "./AGECView";
 import { ISOView } from "./ISOView";
 import { GapAnalysis } from "./GapAnalysis";
+import { ProductTable } from "./ProductTable";
 import {
   ArrowLeft,
   Download,
   Package,
   Globe,
   Scale,
+  BookOpen,
 } from "lucide-react";
 import type { ComplianceData } from "@/lib/schema";
+
+interface ProductHistoryEntry {
+  data: ComplianceData;
+  rawInput: string;
+  timestamp: Date;
+}
 
 interface DashboardProps {
   data: ComplianceData;
   rawInput: string;
   onReset: () => void;
+  productHistory: ProductHistoryEntry[];
 }
 
-export function Dashboard({ data, rawInput, onReset }: DashboardProps) {
+export function Dashboard({ data, rawInput, onReset, productHistory }: DashboardProps) {
   const handleExportJSON = () => {
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
@@ -31,7 +41,7 @@ export function Dashboard({ data, rawInput, onReset }: DashboardProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `circularid-${data.product_identity.name
+    a.download = `arianee-pcds-${data.product_identity.name
       .toLowerCase()
       .replace(/\s+/g, "-")}-compliance.json`;
     a.click();
@@ -76,10 +86,18 @@ export function Dashboard({ data, rawInput, onReset }: DashboardProps) {
             </div>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={handleExportJSON} className="gap-2">
-          <Download size={14} />
-          Export JSON
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link href="/nomenclature">
+            <Button variant="outline" size="sm" className="gap-2">
+              <BookOpen size={14} />
+              Nomenclature
+            </Button>
+          </Link>
+          <Button variant="outline" size="sm" onClick={handleExportJSON} className="gap-2">
+            <Download size={14} />
+            Export JSON
+          </Button>
+        </div>
       </motion.div>
 
       {/* Score Rings Section */}
@@ -147,11 +165,23 @@ export function Dashboard({ data, rawInput, onReset }: DashboardProps) {
         <GapAnalysis scoring={data.meta_scoring} />
       </motion.div>
 
+      {/* Product History Table */}
+      {productHistory.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mb-8"
+        >
+          <ProductTable products={productHistory} />
+        </motion.div>
+      )}
+
       {/* Raw Input Preview */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
+        transition={{ delay: 1.0 }}
         className="glass rounded-xl p-4 mb-12"
       >
         <div className="flex items-center gap-2 mb-2">

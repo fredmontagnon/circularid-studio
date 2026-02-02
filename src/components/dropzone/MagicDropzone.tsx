@@ -85,9 +85,9 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold tracking-tight mb-3">
           <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent">
-            CircularID
+            Arianee
           </span>{" "}
-          <span className="text-white/90">Studio</span>
+          <span className="text-white/90">PCDS Cleaner</span>
         </h1>
         <p className="text-white/40 text-sm max-w-md mx-auto">
           Drop any textile data — supplier emails, PDF content, raw descriptions
@@ -209,7 +209,7 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
 
       {/* Hint */}
       <p className="text-center text-white/15 text-xs mt-4">
-        Powered by Claude AI — ISO 59040 + AGEC dual-compliance engine
+        Powered by Claude AI — ISO 59040 + AGEC dual-compliance engine — Arianee PCDS Cleaner
       </p>
     </div>
   );
