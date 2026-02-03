@@ -146,13 +146,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Limit batch size to prevent timeouts
-    const MAX_BATCH_SIZE = 10;
+    // Limit batch size to prevent timeouts (Vercel Pro allows 5 min)
+    const MAX_BATCH_SIZE = 100;
     const limitedRows = rows.slice(0, MAX_BATCH_SIZE);
     const limitedNames = productNames.slice(0, MAX_BATCH_SIZE);
 
-    // Process rows in parallel (with concurrency limit of 3 to avoid rate limits)
-    const CONCURRENCY = 3;
+    // Process rows in parallel (with concurrency limit of 5 to balance speed/rate limits)
+    const CONCURRENCY = 5;
     const results: Array<{
       success: boolean;
       productName: string;
