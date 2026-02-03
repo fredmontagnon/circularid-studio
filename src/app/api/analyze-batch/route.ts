@@ -1,10 +1,85 @@
 import { buildExtractionPrompt } from "@/lib/prompt";
 
-export const maxDuration = 300; // 5 minutes for batch processing
+export const maxDuration = 300; // 5 minutes for batch processing (requires Vercel Pro)
 
 interface BatchInput {
   rows: string[]; // Array of formatted row strings
   productNames: string[]; // Extracted product names for reference
+}
+
+async function analyzeRow(
+  rowInput: string,
+  productName: string,
+  apiKey: string
+): Promise<{
+  success: boolean;
+  productName: string;
+  data?: unknown;
+  error?: string;
+  rawInput: string;
+}> {
+  try {
+    const prompt = buildExtractionPrompt(rowInput);
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4096,
+        messages: [
+          {
+            role: "user",
+            content:
+              prompt +
+              "\n\nRespond ONLY with valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.",
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      return {
+        success: false,
+        productName,
+        error: `API error: ${errorBody}`,
+        rawInput: rowInput,
+      };
+    }
+
+    const result = await response.json();
+    const textContent = result.content?.[0]?.text || "";
+
+    // Extract JSON from the response
+    let jsonStr = textContent.trim();
+    if (jsonStr.startsWith("```")) {
+      jsonStr = jsonStr
+        .replace(/^```(?:json)?\n?/, "")
+        .replace(/\n?```$/, "");
+    }
+
+    const data = JSON.parse(jsonStr);
+
+    return {
+      success: true,
+      productName,
+      data,
+      rawInput: rowInput,
+    };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      success: false,
+      productName,
+      error: message,
+      rawInput: rowInput,
+    };
+  }
 }
 
 export async function POST(req: Request) {
@@ -26,7 +101,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Process each row sequentially
+    // Limit batch size to prevent timeouts
+    const MAX_BATCH_SIZE = 10;
+    const limitedRows = rows.slice(0, MAX_BATCH_SIZE);
+    const limitedNames = productNames.slice(0, MAX_BATCH_SIZE);
+
+    // Process rows in parallel (with concurrency limit of 3 to avoid rate limits)
+    const CONCURRENCY = 3;
     const results: Array<{
       success: boolean;
       productName: string;
@@ -35,73 +116,17 @@ export async function POST(req: Request) {
       rawInput: string;
     }> = [];
 
-    for (let i = 0; i < rows.length; i++) {
-      const rowInput = rows[i];
-      const productName = productNames[i] || `Product ${i + 1}`;
+    for (let i = 0; i < limitedRows.length; i += CONCURRENCY) {
+      const batch = limitedRows.slice(i, i + CONCURRENCY);
+      const batchNames = limitedNames.slice(i, i + CONCURRENCY);
 
-      try {
-        const prompt = buildExtractionPrompt(rowInput);
+      const batchResults = await Promise.all(
+        batch.map((row, idx) =>
+          analyzeRow(row, batchNames[idx] || `Product ${i + idx + 1}`, apiKey)
+        )
+      );
 
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": apiKey,
-            "anthropic-version": "2023-06-01",
-          },
-          body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 4096,
-            messages: [
-              {
-                role: "user",
-                content:
-                  prompt +
-                  "\n\nRespond ONLY with valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.",
-              },
-            ],
-          }),
-        });
-
-        if (!response.ok) {
-          const errorBody = await response.text();
-          results.push({
-            success: false,
-            productName,
-            error: `API error: ${errorBody}`,
-            rawInput: rowInput,
-          });
-          continue;
-        }
-
-        const result = await response.json();
-        const textContent = result.content?.[0]?.text || "";
-
-        // Extract JSON from the response
-        let jsonStr = textContent.trim();
-        if (jsonStr.startsWith("```")) {
-          jsonStr = jsonStr
-            .replace(/^```(?:json)?\n?/, "")
-            .replace(/\n?```$/, "");
-        }
-
-        const data = JSON.parse(jsonStr);
-
-        results.push({
-          success: true,
-          productName,
-          data,
-          rawInput: rowInput,
-        });
-      } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        results.push({
-          success: false,
-          productName,
-          error: message,
-          rawInput: rowInput,
-        });
-      }
+      results.push(...batchResults);
     }
 
     return Response.json({
@@ -109,6 +134,7 @@ export async function POST(req: Request) {
       total: rows.length,
       processed: results.filter((r) => r.success).length,
       failed: results.filter((r) => !r.success).length,
+      limited: rows.length > MAX_BATCH_SIZE,
       results,
     });
   } catch (error: unknown) {
