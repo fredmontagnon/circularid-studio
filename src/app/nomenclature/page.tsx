@@ -48,7 +48,7 @@ function SectionCard({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm">
             <Icon size={16} className={iconColor} />
-            <span className="text-white/80">{title}</span>
+            <span className="text-slate-700">{title}</span>
             {badge && (
               <Badge variant="secondary" className="ml-auto text-[10px]">
                 {badge}
@@ -56,7 +56,7 @@ function SectionCard({
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-xs text-white/60 leading-relaxed">
+        <CardContent className="space-y-3 text-xs text-slate-600 leading-relaxed">
           {children}
         </CardContent>
       </Card>
@@ -74,12 +74,12 @@ function FieldRow({
   description: string;
 }) {
   return (
-    <div className="flex gap-3 py-2 border-b border-white/5 last:border-0">
+    <div className="flex gap-3 py-2 border-b border-slate-100 last:border-0">
       <div className="min-w-0 flex-1">
-        <code className="text-[10px] font-mono text-cyan-400/80 bg-cyan-500/10 px-1.5 py-0.5 rounded">
+        <code className="text-[10px] font-mono text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded">
           {field}
         </code>
-        <p className="mt-1 text-white/50">{description}</p>
+        <p className="mt-1 text-slate-500">{description}</p>
       </div>
       <Badge variant="secondary" className="text-[9px] h-fit flex-shrink-0">
         {type}
@@ -90,11 +90,11 @@ function FieldRow({
 
 export default function NomenclaturePage() {
   return (
-    <main className="min-h-screen relative">
+    <main className="min-h-screen relative bg-slate-50">
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px]" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-sky-500/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-violet-500/5 rounded-full blur-[120px]" />
       </div>
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-4 py-8">
@@ -104,23 +104,23 @@ export default function NomenclaturePage() {
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft size={14} />
-                Back to Cleaner
+                Retour
               </Button>
             </Link>
           </div>
           <h1 className="text-3xl font-bold tracking-tight mb-3">
             <BookOpen
               size={28}
-              className="inline-block text-cyan-400 mr-3 -mt-1"
+              className="inline-block text-sky-500 mr-3 -mt-1"
             />
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent">
-              Standards Nomenclature
+            <span className="bg-gradient-to-r from-sky-600 via-violet-600 to-sky-500 bg-clip-text text-transparent">
+              Nomenclature des Standards
             </span>
           </h1>
-          <p className="text-white/40 text-sm max-w-2xl">
-            Reference guide for the two compliance frameworks used by Arianee
-            PCDS Cleaner: the French AGEC Law and the international ISO 59040
-            standard for Product Circularity Data Sheets.
+          <p className="text-slate-500 text-sm max-w-2xl">
+            Guide de référence des deux cadres de conformité utilisés par Arianee
+            PCDS Cleaner : la Loi AGEC française et la norme internationale ISO
+            59040 pour les fiches de données de circularité produit.
           </p>
         </motion.div>
 
@@ -129,18 +129,19 @@ export default function NomenclaturePage() {
         {/* ============================================================ */}
         <motion.div {...fadeIn} transition={{ delay: 0.1 }} className="mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <Scale size={22} className="text-purple-400" />
-            <h2 className="text-xl font-semibold text-white/90">
-              Loi AGEC (Anti-Gaspillage pour une Economie Circulaire)
+            <Scale size={22} className="text-violet-500" />
+            <h2 className="text-xl font-semibold text-slate-800">
+              Loi AGEC (Anti-Gaspillage pour une Économie Circulaire)
             </h2>
           </div>
-          <div className="glass rounded-lg p-4 mb-6 text-xs text-white/50 leading-relaxed">
+          <div className="bg-white rounded-lg border border-slate-200 p-4 mb-6 text-xs text-slate-600 leading-relaxed">
             <p>
-              French law n&deg;2020-105 (February 10, 2020) aims to eliminate
-              waste and promote a circular economy. For textile products,
-              it imposes mandatory traceability, recyclability assessment,
-              material disclosure, and hazardous substance labeling.
-              Applicable since January 1, 2023.
+              Loi française n°2020-105 (10 février 2020) visant à éliminer les
+              déchets et promouvoir une économie circulaire. Pour les produits
+              textiles, elle impose une traçabilité obligatoire, une évaluation
+              de la recyclabilité, une déclaration des matériaux et un
+              étiquetage des substances dangereuses. Applicable depuis le 1er
+              janvier 2023.
             </p>
           </div>
         </motion.div>
@@ -148,137 +149,139 @@ export default function NomenclaturePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
           <SectionCard
             icon={MapPin}
-            iconColor="text-cyan-400"
-            title="Traceability (Art. 13)"
+            iconColor="text-sky-500"
+            title="Traçabilité (Art. 13)"
             badge="AGEC"
             delay={0.15}
           >
             <p>
-              Mandatory geographic traceability for 3 key production stages.
-              Each step must be identified by its ISO 3166-1 alpha-2 country
-              code.
+              Traçabilité géographique obligatoire pour 3 étapes clés de
+              production. Chaque étape doit être identifiée par son code pays
+              ISO 3166-1 alpha-2.
             </p>
             <FieldRow
               field="weaving_knitting_country"
               type="ISO 3166-1"
-              description="Country where the fabric was woven or knitted. For footwear: stitching country."
+              description="Pays où le tissu a été tissé ou tricoté. Pour les chaussures : pays de piquage."
             />
             <FieldRow
               field="dyeing_printing_country"
               type="ISO 3166-1"
-              description="Country where the fabric was dyed, printed or finished. For footwear: finishing country."
+              description="Pays où le tissu a été teint, imprimé ou fini. Pour les chaussures : pays de finition."
             />
             <FieldRow
               field="manufacturing_country"
               type="ISO 3166-1"
-              description="Country where the final garment was cut, sewn and assembled. For footwear: final assembly."
+              description="Pays où le vêtement final a été coupé, cousu et assemblé. Pour les chaussures : assemblage final."
             />
           </SectionCard>
 
           <SectionCard
             icon={Recycle}
-            iconColor="text-green-400"
-            title="Recyclability (5 French Criteria)"
+            iconColor="text-emerald-500"
+            title="Recyclabilité (5 Critères Français)"
             badge="AGEC"
             delay={0.2}
           >
             <p>
-              A product is considered recyclable only if ALL 5 criteria are
-              simultaneously met:
+              Un produit est considéré recyclable uniquement si les 5 critères
+              sont simultanément remplis :
             </p>
-            <ol className="list-decimal list-inside space-y-1.5 text-white/50">
+            <ol className="list-decimal list-inside space-y-1.5 text-slate-500">
               <li>
-                <strong className="text-white/70">Collection</strong> &mdash;
-                A collection infrastructure exists for this product category
-                (e.g., textile deposit bins in France via Re_fashion).
+                <strong className="text-slate-700">Collecte</strong> — Une
+                infrastructure de collecte existe pour cette catégorie de
+                produit (ex: bornes textile en France via Re_fashion).
               </li>
               <li>
-                <strong className="text-white/70">Sorting</strong> &mdash;
-                Industrial sorting infrastructure is in place and operational.
+                <strong className="text-slate-700">Tri</strong> — Une
+                infrastructure de tri industriel est en place et opérationnelle.
               </li>
               <li>
-                <strong className="text-white/70">No Disruptors</strong>{" "}
-                &mdash; The product does not contain elements that block
-                recycling: elastane &gt;3%, inseparable metal/plastic trims,
-                bonded multi-layer materials, heavy coatings.
+                <strong className="text-slate-700">Pas de perturbateurs</strong>{" "}
+                — Le produit ne contient pas d&apos;éléments bloquant le recyclage :
+                élasthanne &gt;3%, accessoires métal/plastique inséparables,
+                matériaux multicouches collés, enductions lourdes.
               </li>
               <li>
-                <strong className="text-white/70">Yield &gt;50%</strong>{" "}
-                &mdash; The recycling process must recover more than 50% of
-                the product weight as usable material.
+                <strong className="text-slate-700">Rendement &gt;50%</strong> —
+                Le processus de recyclage doit récupérer plus de 50% du poids du
+                produit en matière utilisable.
               </li>
               <li>
-                <strong className="text-white/70">Industrial Scale</strong>{" "}
-                &mdash; The recycling pathway must operate at industrial scale,
-                not just pilot or laboratory.
+                <strong className="text-slate-700">Échelle industrielle</strong>{" "}
+                — La filière de recyclage doit fonctionner à échelle
+                industrielle, pas seulement pilote ou laboratoire.
               </li>
             </ol>
             <FieldRow
               field="is_majority_recyclable"
               type="Boolean"
-              description="True only if all 5 criteria above are satisfied."
+              description="Vrai uniquement si les 5 critères ci-dessus sont satisfaits."
             />
             <FieldRow
               field="blockers"
               type="String[]"
-              description="List of specific recycling disruptors detected (e.g., 'Elastane 5%', 'Metal zippers non-separable')."
+              description="Liste des perturbateurs de recyclage détectés (ex: 'Élasthanne 5%', 'Fermetures métal non séparables')."
             />
           </SectionCard>
 
           <SectionCard
             icon={FlaskConical}
-            iconColor="text-purple-400"
-            title="Material Analysis"
+            iconColor="text-violet-500"
+            title="Analyse des Matériaux"
             badge="AGEC"
             delay={0.25}
           >
             <p>
-              Mandatory disclosure of fiber composition, including synthetic
-              content and microplastic warning obligations.
+              Déclaration obligatoire de la composition en fibres, incluant le
+              contenu synthétique et les obligations d&apos;avertissement
+              microplastiques.
             </p>
             <FieldRow
               field="synthetic_fiber_percentage"
               type="Number"
-              description="Total % of synthetic fibers (polyester, nylon, acrylic, polypropylene, elastane). Includes all petroleum-derived fibers."
+              description="% total de fibres synthétiques (polyester, nylon, acrylique, polypropylène, élasthanne). Inclut toutes les fibres dérivées du pétrole."
             />
             <FieldRow
               field="microplastic_warning_required"
               type="Boolean"
-              description="If synthetic fibers exceed 50%, the product MUST carry a microplastic release warning label per AGEC Article L541-9-3."
+              description="Si les fibres synthétiques dépassent 50%, le produit DOIT porter une étiquette d'avertissement sur le relargage de microplastiques selon l'article L541-9-3 AGEC."
             />
             <FieldRow
               field="recycled_content_percentage"
               type="Number"
-              description="% of the product made from recycled materials (post-consumer or post-industrial). 0 if none or unknown."
+              description="% du produit fabriqué à partir de matériaux recyclés (post-consommation ou post-industriel). 0 si aucun ou inconnu."
             />
           </SectionCard>
 
           <SectionCard
             icon={AlertTriangle}
-            iconColor="text-orange-400"
-            title="Hazardous Substances (REACH / SVHC)"
-            badge="AGEC + EU"
+            iconColor="text-amber-500"
+            title="Substances Dangereuses (REACH / SVHC)"
+            badge="AGEC + UE"
             delay={0.3}
           >
             <p>
-              Cross-references the EU REACH regulation (EC 1907/2006). Products
-              containing Substances of Very High Concern (SVHC) above 0.1%
-              w/w must be declared.
+              Référence croisée avec le règlement REACH de l&apos;UE (CE 1907/2006).
+              Les produits contenant des Substances Très Préoccupantes (SVHC)
+              au-dessus de 0,1% m/m doivent être déclarés.
             </p>
             <FieldRow
               field="contains_svhc"
               type="Boolean"
-              description="True if any SVHC is present above 0.1% threshold. Common textile SVHCs: nickel (zippers, rivets), lead, chromium VI, formaldehyde, PFAS (water-repellent coatings), phthalates, certain azo dyes, antimony trioxide."
+              description="Vrai si une SVHC est présente au-dessus du seuil de 0,1%. SVHC textiles courantes : nickel (fermetures, rivets), plomb, chrome VI, formaldéhyde, PFAS (traitements hydrofuges), phtalates, certains colorants azoïques, trioxyde d'antimoine."
             />
             <FieldRow
               field="substance_names"
               type="String[]"
-              description="List of specific SVHC substances detected or strongly implied from the product description."
+              description="Liste des substances SVHC spécifiques détectées ou fortement suggérées par la description du produit."
             />
-            <div className="mt-2 p-2 rounded bg-orange-500/5 border border-orange-500/10 text-orange-300/70">
-              <strong>ECHA Candidate List</strong>: The European Chemicals
-              Agency maintains the official SVHC candidate list, updated
-              biannually. Currently 240+ substances.
+            <div className="mt-2 p-2 rounded bg-amber-50 border border-amber-200 text-amber-700">
+              <strong>Liste Candidate ECHA</strong> : L&apos;Agence européenne des
+              produits chimiques maintient la liste officielle des SVHC
+              candidates, mise à jour semestriellement. Actuellement 240+
+              substances.
             </div>
           </SectionCard>
         </div>
@@ -288,18 +291,18 @@ export default function NomenclaturePage() {
         {/* ============================================================ */}
         <motion.div {...fadeIn} transition={{ delay: 0.35 }} className="mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <Globe size={22} className="text-green-400" />
-            <h2 className="text-xl font-semibold text-white/90">
-              ISO 59040 &mdash; Product Circularity Data Sheet (PCDS)
+            <Globe size={22} className="text-emerald-500" />
+            <h2 className="text-xl font-semibold text-slate-800">
+              ISO 59040 — Fiche de Données de Circularité Produit (PCDS)
             </h2>
           </div>
-          <div className="glass rounded-lg p-4 mb-6 text-xs text-white/50 leading-relaxed">
+          <div className="bg-white rounded-lg border border-slate-200 p-4 mb-6 text-xs text-slate-600 leading-relaxed">
             <p>
-              ISO 59040:2024 defines a standardized framework for communicating
-              product circularity information across the value chain. It uses a
-              &ldquo;Statement&rdquo; system organized in 6 sections covering
-              the full product lifecycle: Inputs, Better Use, Value Recovery,
-              End of Life, and Outputs.
+              ISO 59040:2024 définit un cadre standardisé pour communiquer les
+              informations de circularité des produits tout au long de la chaîne
+              de valeur. Elle utilise un système de « Déclarations » organisé en
+              6 sections couvrant le cycle de vie complet du produit : Entrées,
+              Meilleur Usage, Récupération de Valeur, Fin de Vie et Sorties.
             </p>
           </div>
         </motion.div>
@@ -307,60 +310,60 @@ export default function NomenclaturePage() {
         <div className="space-y-4 mb-12">
           <SectionCard
             icon={Package}
-            iconColor="text-cyan-400"
-            title="Section 2 &mdash; Circular Inputs"
+            iconColor="text-sky-500"
+            title="Section 2 — Entrées Circulaires"
             badge="ISO 59040"
             delay={0.4}
           >
             <p>
-              Evaluates how circular the raw materials used in the product
-              are.
+              Évalue le caractère circulaire des matières premières utilisées
+              dans le produit.
             </p>
             <FieldRow
               field="statement_2503_post_consumer"
               type="Boolean"
-              description="PCDS Statement 2503: Product contains >25% post-consumer recycled content. Post-consumer = material from end-user waste streams (used clothing, collected textiles). Distinguished from post-industrial (factory scraps)."
+              description="Déclaration PCDS 2503 : Le produit contient >25% de contenu recyclé post-consommation. Post-consommation = matériau provenant de flux de déchets d'utilisateurs finaux (vêtements usagés, textiles collectés). Distinct du post-industriel (chutes d'usine)."
             />
             <FieldRow
               field="statement_2301_reach_compliant"
               type="Boolean"
-              description="PCDS Statement 2301: Product is fully REACH compliant with no SVHC detected above the 0.1% threshold. This is the chemical safety gate for circular inputs."
+              description="Déclaration PCDS 2301 : Le produit est entièrement conforme REACH sans SVHC détectée au-dessus du seuil de 0,1%. C'est la porte d'entrée sécurité chimique pour les entrées circulaires."
             />
           </SectionCard>
 
           <SectionCard
             icon={Wrench}
-            iconColor="text-purple-400"
-            title="Section 3 &mdash; Better Use (Longevity)"
+            iconColor="text-violet-500"
+            title="Section 3 — Meilleur Usage (Longévité)"
             badge="ISO 59040"
             delay={0.45}
           >
             <p>
-              Measures whether the product is designed for extended use
-              through repairability.
+              Mesure si le produit est conçu pour un usage prolongé grâce à sa
+              réparabilité.
             </p>
             <FieldRow
               field="statement_3000_repairable"
               type="Boolean"
-              description="PCDS Statement 3000: The product is designed so a non-expert consumer can repair it. Evaluated by: replaceable buttons/zippers, accessible seams, availability of repair kits, modular construction, repair instructions included."
+              description="Déclaration PCDS 3000 : Le produit est conçu pour qu'un consommateur non-expert puisse le réparer. Évalué par : boutons/fermetures remplaçables, coutures accessibles, disponibilité de kits de réparation, construction modulaire, instructions de réparation incluses."
             />
           </SectionCard>
 
           <SectionCard
             icon={RotateCcw}
-            iconColor="text-green-400"
-            title="Section 5 &mdash; End of Life"
+            iconColor="text-emerald-500"
+            title="Section 5 — Fin de Vie"
             badge="ISO 59040"
             delay={0.5}
           >
             <p>
-              Evaluates whether the product is designed to feed back into the
-              material cycle at end of life.
+              Évalue si le produit est conçu pour réintégrer le cycle des
+              matériaux en fin de vie.
             </p>
             <FieldRow
               field="statement_5032_closed_loop"
               type="Boolean"
-              description="PCDS Statement 5032: Product is designed for fiber-to-fiber (closed-loop) recycling. Requires: mono-material composition OR easily separable components, no chemical disruptors, compatible with existing recycling infrastructure. Multi-material products with elastane, coatings or bonded layers fail this criterion."
+              description="Déclaration PCDS 5032 : Le produit est conçu pour le recyclage fibre-à-fibre (boucle fermée). Requiert : composition mono-matière OU composants facilement séparables, pas de perturbateurs chimiques, compatible avec l'infrastructure de recyclage existante. Les produits multi-matériaux avec élasthanne, enductions ou couches collées échouent à ce critère."
             />
           </SectionCard>
         </div>
@@ -370,9 +373,9 @@ export default function NomenclaturePage() {
         {/* ============================================================ */}
         <motion.div {...fadeIn} transition={{ delay: 0.55 }} className="mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <ShieldCheck size={22} className="text-yellow-400" />
-            <h2 className="text-xl font-semibold text-white/90">
-              Scoring Methodology
+            <ShieldCheck size={22} className="text-amber-500" />
+            <h2 className="text-xl font-semibold text-slate-800">
+              Méthodologie de Scoring
             </h2>
           </div>
         </motion.div>
@@ -380,19 +383,19 @@ export default function NomenclaturePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
           <SectionCard
             icon={FileText}
-            iconColor="text-cyan-400"
-            title="Data Completeness Score"
+            iconColor="text-sky-500"
+            title="Score de Complétude des Données"
             badge="0-100"
             delay={0.6}
           >
             <p>
-              Measures how much data was successfully extracted from the
-              unstructured input.
+              Mesure la quantité de données extraites avec succès de l&apos;entrée
+              non structurée.
             </p>
-            <div className="bg-white/[0.02] rounded-md p-3 font-mono text-[10px] text-white/50">
-              <p className="text-white/70 mb-1">Formula:</p>
-              <p>score = (non_null_fields / total_fields) &times; 100</p>
-              <p className="mt-2 text-white/70">Key tracked fields:</p>
+            <div className="bg-slate-50 rounded-md p-3 font-mono text-[10px] text-slate-600">
+              <p className="text-slate-700 mb-1">Formule :</p>
+              <p>score = (champs_remplis / champs_totaux) × 100</p>
+              <p className="mt-2 text-slate-700">Champs suivis :</p>
               <p>
                 name, gtin, sku, weaving_country, dyeing_country,
                 manufacturing_country, synthetic_%, recycled_%, svhc_status
@@ -402,45 +405,52 @@ export default function NomenclaturePage() {
 
           <SectionCard
             icon={Recycle}
-            iconColor="text-green-400"
-            title="Circularity Performance Score"
+            iconColor="text-emerald-500"
+            title="Score de Conformité AGEC"
             badge="0-100"
             delay={0.65}
           >
             <p>
-              Weighted score reflecting the product&apos;s actual circular
-              economy performance.
+              Score pondéré reflétant la conformité réglementaire du produit.
             </p>
-            <div className="bg-white/[0.02] rounded-md p-3 space-y-1.5 text-[10px]">
+            <div className="bg-slate-50 rounded-md p-3 space-y-1.5 text-[10px]">
               <div className="flex justify-between">
-                <span className="text-white/50">
-                  Recycled content &gt;25%
+                <span className="text-slate-500">
+                  Traçabilité complète (3/3 pays)
                 </span>
-                <span className="text-green-400 font-mono">+25 pts</span>
+                <span className="text-emerald-600 font-mono">+30 pts</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white/50">
-                  Majority recyclable (5 criteria)
+                <span className="text-slate-500">
+                  Recyclabilité conforme (5 critères)
                 </span>
-                <span className="text-green-400 font-mono">+25 pts</span>
+                <span className="text-emerald-600 font-mono">+25 pts</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white/50">No hazardous substances</span>
-                <span className="text-green-400 font-mono">+20 pts</span>
+                <span className="text-slate-500">Pas de substances SVHC</span>
+                <span className="text-emerald-600 font-mono">+20 pts</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white/50">
-                  Full traceability (3/3 countries)
+                <span className="text-slate-500">
+                  Contenu recyclé présent (&gt;0%)
                 </span>
-                <span className="text-green-400 font-mono">+15 pts</span>
+                <span className="text-emerald-600 font-mono">+15 pts</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-white/50">Closed-loop design</span>
-                <span className="text-green-400 font-mono">+15 pts</span>
+                <span className="text-slate-500">
+                  Bonus si contenu recyclé &gt;25%
+                </span>
+                <span className="text-emerald-600 font-mono">+10 pts</span>
               </div>
-              <div className="flex justify-between border-t border-white/10 pt-1.5 mt-1.5">
-                <span className="text-white/70 font-semibold">Maximum</span>
-                <span className="text-white/70 font-mono font-semibold">
+              <div className="flex justify-between">
+                <span className="text-slate-500">
+                  Pas d&apos;avertissement microplastique
+                </span>
+                <span className="text-emerald-600 font-mono">+10 pts</span>
+              </div>
+              <div className="flex justify-between border-t border-slate-200 pt-1.5 mt-1.5">
+                <span className="text-slate-700 font-semibold">Maximum</span>
+                <span className="text-slate-700 font-mono font-semibold">
                   100 pts
                 </span>
               </div>
@@ -452,40 +462,35 @@ export default function NomenclaturePage() {
         <motion.div
           {...fadeIn}
           transition={{ delay: 0.7 }}
-          className="glass rounded-xl p-6 mb-12"
+          className="bg-white rounded-xl border border-slate-200 p-6 mb-12"
         >
-          <h3 className="text-sm font-semibold text-white/70 mb-4 flex items-center gap-2">
-            <ExternalLink size={14} className="text-cyan-400" />
-            Official References
+          <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+            <ExternalLink size={14} className="text-sky-500" />
+            Références Officielles
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div className="space-y-2 text-white/40">
-              <p className="text-white/60 font-semibold">AGEC Law</p>
+            <div className="space-y-2 text-slate-500">
+              <p className="text-slate-700 font-semibold">Loi AGEC</p>
               <p>
-                Loi n&deg;2020-105 du 10 f&eacute;vrier 2020 relative &agrave; la lutte
-                contre le gaspillage et &agrave; l&apos;&eacute;conomie circulaire
+                Loi n°2020-105 du 10 février 2020 relative à la lutte contre le
+                gaspillage et à l&apos;économie circulaire
               </p>
+              <p>Décret n°2022-748 — Traçabilité textile</p>
               <p>
-                D&eacute;cret n&deg;2022-748 &mdash; Tra&ccedil;abilit&eacute; textile
-              </p>
-              <p>
-                Re_fashion (formerly Eco-TLC) &mdash; French textile EPR
-                scheme
+                Re_fashion (anciennement Eco-TLC) — Éco-organisme textile
+                français
               </p>
             </div>
-            <div className="space-y-2 text-white/40">
-              <p className="text-white/60 font-semibold">ISO 59040</p>
+            <div className="space-y-2 text-slate-500">
+              <p className="text-slate-700 font-semibold">ISO 59040</p>
               <p>
-                ISO 59040:2024 &mdash; Circular economy &mdash; Product
-                circularity data sheet
+                ISO 59040:2024 — Économie circulaire — Fiche de données de
+                circularité produit
               </p>
               <p>
-                REACH Regulation (EC) No 1907/2006 &mdash; ECHA SVHC Candidate
-                List
+                Règlement REACH (CE) n°1907/2006 — Liste Candidate SVHC ECHA
               </p>
-              <p>
-                ISO 3166-1 &mdash; Country codes (alpha-2)
-              </p>
+              <p>ISO 3166-1 — Codes pays (alpha-2)</p>
             </div>
           </div>
         </motion.div>
