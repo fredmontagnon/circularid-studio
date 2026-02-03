@@ -53,10 +53,20 @@ export async function POST(req: Request) {
     const result = await response.json();
     const textContent = result.content?.[0]?.text || "";
 
-    // Extract JSON from the response
+    // Extract JSON from the response - handle various formats
     let jsonStr = textContent.trim();
+
+    // Remove markdown code fences if present
     if (jsonStr.startsWith("```")) {
-      jsonStr = jsonStr.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+      jsonStr = jsonStr
+        .replace(/^```(?:json)?\s*\n?/, "")
+        .replace(/\n?\s*```$/, "");
+    }
+
+    // Try to find JSON object if there's extra text
+    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[0];
     }
 
     const data = JSON.parse(jsonStr);

@@ -90,7 +90,14 @@ export default function Home() {
           );
 
         if (successfulProducts.length === 0) {
-          throw new Error("No products could be analyzed from the CSV");
+          // Get first error for debugging
+          const firstError = result.results.find(
+            (r: { success: boolean; error?: string }) => !r.success
+          );
+          const errorDetail = firstError?.error || "Unknown error";
+          throw new Error(
+            `No products could be analyzed from the CSV. Error: ${errorDetail}`
+          );
         }
 
         setBatchProducts(successfulProducts);
@@ -162,7 +169,7 @@ export default function Home() {
             <div className="w-full">
               <MagicDropzone onSubmit={handleSubmit} isLoading={false} />
               {error && (
-                <div className="max-w-3xl mx-auto mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-sm text-center">
+                <div className="max-w-3xl mx-auto mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm text-center">
                   {error}
                 </div>
               )}

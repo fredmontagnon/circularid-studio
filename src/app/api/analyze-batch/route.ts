@@ -55,28 +55,65 @@ async function analyzeRow(
     const result = await response.json();
     const textContent = result.content?.[0]?.text || "";
 
-    // Extract JSON from the response
-    let jsonStr = textContent.trim();
-    if (jsonStr.startsWith("```")) {
-      jsonStr = jsonStr
-        .replace(/^```(?:json)?\n?/, "")
-        .replace(/\n?```$/, "");
+    if (!textContent) {
+      return {
+        success: false,
+        productName,
+        error: "Empty response from API",
+        rawInput: rowInput,
+      };
     }
 
-    const data = JSON.parse(jsonStr);
+    // Extract JSON from the response - handle various formats
+    let jsonStr = textContent.trim();
 
-    return {
-      success: true,
-      productName,
-      data,
-      rawInput: rowInput,
-    };
+    // Remove markdown code fences if present
+    if (jsonStr.startsWith("```")) {
+      jsonStr = jsonStr
+        .replace(/^```(?:json)?\s*\n?/, "")
+        .replace(/\n?\s*```$/, "");
+    }
+
+    // Try to find JSON object if there's extra text
+    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[0];
+    }
+
+    try {
+      const data = JSON.parse(jsonStr);
+
+      // Validate that the parsed data has the expected structure
+      if (!data.product_identity || !data.agec_compliance || !data.meta_scoring) {
+        return {
+          success: false,
+          productName,
+          error: `Invalid response structure - missing required fields`,
+          rawInput: rowInput,
+        };
+      }
+
+      return {
+        success: true,
+        productName,
+        data,
+        rawInput: rowInput,
+      };
+    } catch (parseError) {
+      console.error(`JSON parse error for ${productName}:`, jsonStr.substring(0, 500));
+      return {
+        success: false,
+        productName,
+        error: `JSON parse error: ${jsonStr.substring(0, 100)}...`,
+        rawInput: rowInput,
+      };
+    }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
       productName,
-      error: message,
+      error: `Request error: ${message}`,
       rawInput: rowInput,
     };
   }
