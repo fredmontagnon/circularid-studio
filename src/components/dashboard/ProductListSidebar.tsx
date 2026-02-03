@@ -126,11 +126,11 @@ export function ProductListSidebar({
                   {/* Mini stats */}
                   <div className="flex items-center gap-3 mt-1.5 text-[9px] text-slate-400">
                     <span>
-                      Data:{" "}
-                      {product.data.meta_scoring.data_completeness_score}%
+                      AGEC:{" "}
+                      {product.data.meta_scoring.circularity_performance_score}%
                     </span>
                     <span>
-                      Gaps:{" "}
+                      Actions:{" "}
                       {product.data.meta_scoring.gap_analysis_advice.length}
                     </span>
                   </div>
@@ -163,7 +163,7 @@ export function ProductListSidebar({
                 ).length
               }
             </div>
-            <div className="text-[9px] text-slate-400 uppercase">Good</div>
+            <div className="text-[9px] text-slate-400 uppercase">Conforme</div>
           </div>
           <div>
             <div className="text-lg font-bold text-amber-600">
@@ -175,7 +175,7 @@ export function ProductListSidebar({
                 ).length
               }
             </div>
-            <div className="text-[9px] text-slate-400 uppercase">Medium</div>
+            <div className="text-[9px] text-slate-400 uppercase">Partiel</div>
           </div>
           <div>
             <div className="text-lg font-bold text-red-600">
@@ -186,7 +186,7 @@ export function ProductListSidebar({
                 ).length
               }
             </div>
-            <div className="text-[9px] text-slate-400 uppercase">Low</div>
+            <div className="text-[9px] text-slate-400 uppercase">À revoir</div>
           </div>
         </div>
       </div>

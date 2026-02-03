@@ -32,13 +32,19 @@ export function buildExtractionPrompt(rawInput: string): string {
    - \`statement_5032_closed_loop\`: true only if the product is mono-material or explicitly designed for fiber-to-fiber recycling.
 
 7. **Scoring Rules:**
-   - \`data_completeness_score\`: Count non-null extracted fields / total extractable fields * 100. Key fields: name, gtin, sku, weaving_country, dyeing_country, manufacturing_country, synthetic_percentage, recycled_percentage, svhc status.
-   - \`circularity_performance_score\`: Weighted score:
-     * Recycled content >25% = +25pts
-     * is_majority_recyclable = true = +25pts
-     * No hazardous substances = +20pts
-     * All 3 traceability countries known = +15pts
-     * Closed-loop design = +15pts
+   - \`data_completeness_score\`: Percentage of key fields that have data (not null). Key fields to count:
+     * Product identity: name (required), gtin, sku
+     * Traceability: weaving_country, dyeing_country, manufacturing_country
+     * Materials: synthetic_percentage (if composition mentioned), recycled_percentage
+     * Calculate: (filled fields / total applicable fields) * 100, rounded to integer.
+
+   - \`circularity_performance_score\`: AGEC compliance score based on regulatory requirements. Calculate as follows:
+     * Traceability complete (all 3 countries known) = +30pts (AGEC Article 13 mandatory)
+     * Recyclability criteria met (is_majority_recyclable = true) = +25pts
+     * No SVHC/hazardous substances detected = +20pts (REACH compliance)
+     * Recycled content present (>0%) = +15pts (bonus, +10 extra if >25%)
+     * No microplastic warning needed (synthetic ≤50%) = +10pts
+     * Maximum possible = 100pts if all criteria met with >25% recycled content
 
 8. **Gap Analysis — ENRICHED ACTIONABLE ADVICE:**
    For every \`null\` field or compliance gap, generate ONE **detailed, precise** advice string. Each advice MUST follow this enriched format:

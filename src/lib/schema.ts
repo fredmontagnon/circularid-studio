@@ -107,7 +107,7 @@ export const metaScoringSchema = z.object({
     .min(0)
     .max(100)
     .describe(
-      "Score from 0-100 based on: recycled content (25pts), recyclability (25pts), no hazardous substances (20pts), traceability completeness (15pts), closed-loop design (15pts)"
+      "AGEC compliance score 0-100: traceability complete (30pts), recyclability met (25pts), no SVHC (20pts), recycled content (15pts, +10 if >25%), no microplastic warning (10pts)"
     ),
   gap_analysis_advice: z
     .array(z.string())
