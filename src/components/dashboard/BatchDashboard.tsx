@@ -81,17 +81,17 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between px-6 py-4 border-b border-white/10"
+        className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white"
       >
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={onReset} className="gap-2">
             <ArrowLeft size={14} />
             New Analysis
           </Button>
-          <div className="h-6 w-px bg-white/10" />
+          <div className="h-6 w-px bg-slate-200" />
           <div className="flex items-center gap-2">
-            <FileSpreadsheet size={18} className="text-cyan-400" />
-            <span className="text-sm font-medium text-white/80">
+            <FileSpreadsheet size={18} className="text-sky-500" />
+            <span className="text-sm font-medium text-slate-700">
               Batch Analysis
             </span>
             <Badge variant="default" className="text-[10px]">
@@ -125,7 +125,7 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
-          className="w-80 flex-shrink-0 border-r border-white/10 bg-black/20"
+          className="w-80 flex-shrink-0 border-r border-slate-200 bg-white"
         >
           <ProductListSidebar
             products={products}
@@ -140,13 +140,13 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="flex-1 overflow-y-auto px-6 py-6"
+          className="flex-1 overflow-y-auto px-6 py-6 bg-slate-50"
         >
           {/* Product Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-semibold text-white/90 flex items-center gap-2">
-                <Package size={20} className="text-cyan-400" />
+              <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                <Package size={20} className="text-sky-500" />
                 {selectedProduct.data.product_identity.name}
               </h2>
               <div className="flex items-center gap-2 mt-1">
@@ -174,7 +174,7 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
           </div>
 
           {/* Score Rings */}
-          <div className="glass rounded-2xl p-6 mb-6">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
             <div className="flex items-center justify-center gap-12">
               <ScoreRing
                 score={selectedProduct.data.meta_scoring.data_completeness_score}
@@ -183,7 +183,7 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
                 size={160}
                 delay={0}
               />
-              <div className="h-24 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+              <div className="h-24 w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent" />
               <ScoreRing
                 score={
                   selectedProduct.data.meta_scoring.circularity_performance_score
@@ -226,13 +226,13 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
           </div>
 
           {/* Raw Input Preview */}
-          <div className="glass rounded-xl p-4">
+          <div className="bg-white border border-slate-200 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
                 Original Input
               </span>
             </div>
-            <pre className="text-xs text-white/25 font-mono whitespace-pre-wrap max-h-24 overflow-auto">
+            <pre className="text-xs text-slate-500 font-mono whitespace-pre-wrap max-h-24 overflow-auto">
               {selectedProduct.rawInput}
             </pre>
           </div>

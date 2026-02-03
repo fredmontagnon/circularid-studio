@@ -23,15 +23,15 @@ interface ProductListSidebarProps {
 }
 
 function getScoreColor(score: number): string {
-  if (score >= 80) return "text-green-400";
-  if (score >= 50) return "text-orange-400";
-  return "text-red-400";
+  if (score >= 80) return "text-emerald-600";
+  if (score >= 50) return "text-amber-600";
+  return "text-red-600";
 }
 
 function getScoreBg(score: number): string {
-  if (score >= 80) return "bg-green-500/10";
-  if (score >= 50) return "bg-orange-500/10";
-  return "bg-red-500/10";
+  if (score >= 80) return "bg-emerald-50";
+  if (score >= 50) return "bg-amber-50";
+  return "bg-red-50";
 }
 
 export function ProductListSidebar({
@@ -42,12 +42,12 @@ export function ProductListSidebar({
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-white/10">
-        <h2 className="text-sm font-semibold text-white/80 flex items-center gap-2">
-          <Package size={16} className="text-cyan-400" />
+      <div className="p-4 border-b border-slate-200">
+        <h2 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+          <Package size={16} className="text-sky-500" />
           Products ({products.length})
         </h2>
-        <p className="text-[10px] text-white/30 mt-1">
+        <p className="text-[10px] text-slate-400 mt-1">
           Click a product to view its compliance data
         </p>
       </div>
@@ -69,10 +69,10 @@ export function ProductListSidebar({
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: idx * 0.03 }}
               onClick={() => onSelectProduct(idx)}
-              className={`w-full text-left p-3 border-b border-white/5 transition-all group ${
+              className={`w-full text-left p-3 border-b border-slate-100 transition-all group ${
                 isSelected
-                  ? "bg-cyan-500/10 border-l-2 border-l-cyan-400"
-                  : "hover:bg-white/[0.02] border-l-2 border-l-transparent"
+                  ? "bg-sky-50 border-l-2 border-l-sky-500"
+                  : "hover:bg-slate-50 border-l-2 border-l-transparent"
               }`}
             >
               <div className="flex items-start gap-3">
@@ -96,7 +96,7 @@ export function ProductListSidebar({
                   <div className="flex items-center gap-2">
                     <span
                       className={`text-sm font-medium truncate ${
-                        isSelected ? "text-cyan-300" : "text-white/80"
+                        isSelected ? "text-sky-700" : "text-slate-700"
                       }`}
                     >
                       {product.data.product_identity.name}
@@ -104,7 +104,7 @@ export function ProductListSidebar({
                     {hasWarnings && (
                       <AlertTriangle
                         size={12}
-                        className="text-orange-400 flex-shrink-0"
+                        className="text-amber-500 flex-shrink-0"
                       />
                     )}
                   </div>
@@ -118,13 +118,13 @@ export function ProductListSidebar({
                     {product.data.agec_compliance.recyclability
                       .is_majority_recyclable && (
                       <span title="Recyclable">
-                        <CheckCircle2 size={10} className="text-green-400" />
+                        <CheckCircle2 size={10} className="text-emerald-500" />
                       </span>
                     )}
                   </div>
 
                   {/* Mini stats */}
-                  <div className="flex items-center gap-3 mt-1.5 text-[9px] text-white/30">
+                  <div className="flex items-center gap-3 mt-1.5 text-[9px] text-slate-400">
                     <span>
                       Data:{" "}
                       {product.data.meta_scoring.data_completeness_score}%
@@ -141,8 +141,8 @@ export function ProductListSidebar({
                   size={14}
                   className={`flex-shrink-0 mt-3 transition-transform ${
                     isSelected
-                      ? "text-cyan-400 translate-x-0.5"
-                      : "text-white/20 group-hover:text-white/40"
+                      ? "text-sky-500 translate-x-0.5"
+                      : "text-slate-300 group-hover:text-slate-400"
                   }`}
                 />
               </div>
@@ -152,10 +152,10 @@ export function ProductListSidebar({
       </div>
 
       {/* Summary Footer */}
-      <div className="p-3 border-t border-white/10 bg-white/[0.02]">
+      <div className="p-3 border-t border-slate-200 bg-slate-50">
         <div className="grid grid-cols-3 gap-2 text-center">
           <div>
-            <div className="text-lg font-bold text-green-400">
+            <div className="text-lg font-bold text-emerald-600">
               {
                 products.filter(
                   (p) =>
@@ -163,10 +163,10 @@ export function ProductListSidebar({
                 ).length
               }
             </div>
-            <div className="text-[9px] text-white/30 uppercase">Good</div>
+            <div className="text-[9px] text-slate-400 uppercase">Good</div>
           </div>
           <div>
-            <div className="text-lg font-bold text-orange-400">
+            <div className="text-lg font-bold text-amber-600">
               {
                 products.filter(
                   (p) =>
@@ -175,10 +175,10 @@ export function ProductListSidebar({
                 ).length
               }
             </div>
-            <div className="text-[9px] text-white/30 uppercase">Medium</div>
+            <div className="text-[9px] text-slate-400 uppercase">Medium</div>
           </div>
           <div>
-            <div className="text-lg font-bold text-red-400">
+            <div className="text-lg font-bold text-red-600">
               {
                 products.filter(
                   (p) =>
@@ -186,7 +186,7 @@ export function ProductListSidebar({
                 ).length
               }
             </div>
-            <div className="text-[9px] text-white/30 uppercase">Low</div>
+            <div className="text-[9px] text-slate-400 uppercase">Low</div>
           </div>
         </div>
       </div>

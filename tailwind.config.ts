@@ -1,7 +1,6 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -39,12 +38,15 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        cyber: {
-          cyan: "#00f0ff",
-          magenta: "#ff00aa",
-          green: "#39ff14",
-          orange: "#ff6a00",
-          purple: "#a855f7",
+        // Arianee-inspired light theme colors
+        arianee: {
+          primary: "#0ea5e9",    // Sky blue
+          secondary: "#64748b",  // Slate
+          success: "#22c55e",    // Green
+          warning: "#f59e0b",    // Amber
+          danger: "#ef4444",     // Red
+          purple: "#8b5cf6",     // Purple accent
+          teal: "#14b8a6",       // Teal
         },
       },
       borderRadius: {

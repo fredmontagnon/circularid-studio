@@ -66,10 +66,10 @@ export function Dashboard({ data, rawInput, onReset, productHistory }: Dashboard
             <ArrowLeft size={14} />
             New Analysis
           </Button>
-          <div className="h-6 w-px bg-white/10" />
+          <div className="h-6 w-px bg-slate-200" />
           <div>
-            <h2 className="text-lg font-semibold text-white/90 flex items-center gap-2">
-              <Package size={18} className="text-cyan-400" />
+            <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+              <Package size={18} className="text-sky-500" />
               {data.product_identity.name}
             </h2>
             <div className="flex items-center gap-2 mt-0.5">
@@ -105,7 +105,7 @@ export function Dashboard({ data, rawInput, onReset, productHistory }: Dashboard
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="glass rounded-2xl p-8 mb-8"
+        className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-8"
       >
         <div className="flex items-center justify-center gap-16">
           <ScoreRing
@@ -115,7 +115,7 @@ export function Dashboard({ data, rawInput, onReset, productHistory }: Dashboard
             size={200}
             delay={200}
           />
-          <div className="h-32 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+          <div className="h-32 w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent" />
           <ScoreRing
             score={data.meta_scoring.circularity_performance_score}
             label="Circularity Score"
@@ -182,14 +182,14 @@ export function Dashboard({ data, rawInput, onReset, productHistory }: Dashboard
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.0 }}
-        className="glass rounded-xl p-4 mb-12"
+        className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-12"
       >
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
             Original Input
           </span>
         </div>
-        <pre className="text-xs text-white/25 font-mono whitespace-pre-wrap max-h-24 overflow-auto">
+        <pre className="text-xs text-slate-500 font-mono whitespace-pre-wrap max-h-24 overflow-auto">
           {rawInput}
         </pre>
       </motion.div>

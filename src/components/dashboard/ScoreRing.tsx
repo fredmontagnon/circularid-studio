@@ -20,24 +20,24 @@ function getScoreColor(score: number): {
 } {
   if (score >= 80) {
     return {
-      primary: "#39ff14",
-      glow: "rgba(57, 255, 20, 0.3)",
-      bg: "rgba(57, 255, 20, 0.05)",
+      primary: "#22c55e",
+      glow: "rgba(34, 197, 94, 0.3)",
+      bg: "rgba(34, 197, 94, 0.05)",
       class: "glow-green",
     };
   }
   if (score >= 50) {
     return {
-      primary: "#ff6a00",
-      glow: "rgba(255, 106, 0, 0.3)",
-      bg: "rgba(255, 106, 0, 0.05)",
+      primary: "#f59e0b",
+      glow: "rgba(245, 158, 11, 0.3)",
+      bg: "rgba(245, 158, 11, 0.05)",
       class: "glow-orange",
     };
   }
   return {
-    primary: "#ff0032",
-    glow: "rgba(255, 0, 50, 0.3)",
-    bg: "rgba(255, 0, 50, 0.05)",
+    primary: "#ef4444",
+    glow: "rgba(239, 68, 68, 0.3)",
+    bg: "rgba(239, 68, 68, 0.05)",
     class: "glow-red",
   };
 }
@@ -84,7 +84,7 @@ export function ScoreRing({
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: delay / 1000, duration: 0.5, ease: "easeOut" }}
-      className={`relative flex flex-col items-center ${colors.class}`}
+      className={`relative flex flex-col items-center`}
       style={{ width: size }}
     >
       <div className="relative" style={{ width: size, height: size }}>
@@ -103,7 +103,7 @@ export function ScoreRing({
               cornerRadius={4}
             >
               <Cell fill={colors.primary} />
-              <Cell fill="rgba(255,255,255,0.05)" />
+              <Cell fill="#e2e8f0" />
             </Pie>
           </PieChart>
         </ResponsiveContainer>
@@ -117,8 +117,7 @@ export function ScoreRing({
             {animatedScore}
           </motion.span>
           <span
-            className="text-[10px] font-mono uppercase tracking-widest"
-            style={{ color: colors.primary, opacity: 0.6 }}
+            className="text-[10px] font-mono uppercase tracking-widest text-slate-400"
           >
             / 100
           </span>
@@ -126,9 +125,9 @@ export function ScoreRing({
       </div>
 
       <div className="mt-2 text-center">
-        <p className="text-sm font-medium text-white/80">{label}</p>
+        <p className="text-sm font-medium text-slate-700">{label}</p>
         {subtitle && (
-          <p className="text-xs text-white/30 mt-0.5">{subtitle}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
         )}
       </div>
     </motion.div>

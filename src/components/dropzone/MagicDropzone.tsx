@@ -84,12 +84,12 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold tracking-tight mb-3">
-          <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-300 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-sky-500 via-violet-500 to-sky-400 bg-clip-text text-transparent">
             Arianee
           </span>{" "}
-          <span className="text-white/90">PCDS Cleaner</span>
+          <span className="text-slate-800">PCDS Cleaner</span>
         </h1>
-        <p className="text-white/40 text-sm max-w-md mx-auto">
+        <p className="text-slate-500 text-sm max-w-md mx-auto">
           Drop any textile data — supplier emails, PDF content, raw descriptions
           — and watch it transform into dual-compliance structured data.
         </p>
@@ -100,11 +100,11 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`relative rounded-2xl transition-all duration-300 ${
+        className={`relative rounded-2xl transition-all duration-300 border-2 border-dashed ${
           isDragOver
-            ? "glass-strong glow-cyan scale-[1.02]"
-            : "glass hover:border-cyan-500/20"
-        }`}
+            ? "border-sky-400 bg-sky-50 scale-[1.02]"
+            : "border-slate-200 bg-white hover:border-sky-300 hover:bg-slate-50"
+        } shadow-sm`}
       >
         {/* Animated border gradient */}
         <div
@@ -113,7 +113,7 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
           }`}
           style={{
             background:
-              "linear-gradient(45deg, rgba(0,240,255,0.1), rgba(168,85,247,0.1), rgba(0,240,255,0.1))",
+              "linear-gradient(45deg, rgba(14,165,233,0.05), rgba(139,92,246,0.05), rgba(14,165,233,0.05))",
           }}
         />
 
@@ -124,13 +124,13 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
               placeholder={"Paste your textile product data here...\n\nExamples:\n\u2022 Supplier email content\n\u2022 PDF text extraction\n\u2022 Raw product descriptions\n\u2022 Material composition sheets"}
-              className="w-full h-48 bg-transparent border-0 text-white/90 placeholder-white/20 resize-none focus:outline-none focus:ring-0 text-sm font-mono leading-relaxed"
+              className="w-full h-48 bg-transparent border-0 text-slate-800 placeholder-slate-400 resize-none focus:outline-none focus:ring-0 text-sm font-mono leading-relaxed"
               disabled={isLoading}
             />
             {textInput && (
               <button
                 onClick={clearInput}
-                className="absolute top-0 right-0 p-1 text-white/30 hover:text-white/60 transition-colors"
+                className="absolute top-0 right-0 p-1 text-slate-400 hover:text-slate-600 transition-colors"
               >
                 <X size={16} />
               </button>
@@ -139,9 +139,9 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-4">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            <span className="text-white/20 text-xs font-mono">OR</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+            <span className="text-slate-400 text-xs font-medium">OR</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
           </div>
 
           {/* Action Buttons Row */}
@@ -177,7 +177,7 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
             />
 
             {fileName && (
-              <span className="text-xs text-cyan-400/60 flex items-center gap-1">
+              <span className="text-xs text-sky-600 flex items-center gap-1">
                 <FileText size={12} />
                 {fileName}
               </span>
@@ -208,8 +208,8 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
       </div>
 
       {/* Hint */}
-      <p className="text-center text-white/15 text-xs mt-4">
-        Powered by Claude AI — ISO 59040 + AGEC dual-compliance engine — Arianee PCDS Cleaner
+      <p className="text-center text-slate-400 text-xs mt-4">
+        Powered by Claude AI — ISO 59040 + AGEC dual-compliance engine
       </p>
     </div>
   );

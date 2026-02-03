@@ -37,8 +37,8 @@ function StatementRow({
       transition={{ delay, duration: 0.4 }}
       className={`p-4 rounded-lg border transition-all ${
         value
-          ? "border-green-500/20 bg-green-500/5 hover:border-green-500/30"
-          : "border-red-500/20 bg-red-500/5 hover:border-red-500/30"
+          ? "border-emerald-200 bg-emerald-50 hover:border-emerald-300"
+          : "border-red-200 bg-red-50 hover:border-red-300"
       }`}
     >
       <div className="flex items-start justify-between">
@@ -47,15 +47,15 @@ function StatementRow({
             <Badge variant={value ? "success" : "danger"} className="text-[10px] font-mono">
               {code}
             </Badge>
-            <span className="text-sm font-medium text-white/80">{label}</span>
+            <span className="text-sm font-medium text-slate-700">{label}</span>
           </div>
-          <p className="text-xs text-white/40 mt-1">{description}</p>
+          <p className="text-xs text-slate-500 mt-1">{description}</p>
         </div>
         <div className="ml-4">
           {value ? (
-            <CheckCircle2 size={20} className="text-green-400" />
+            <CheckCircle2 size={20} className="text-emerald-500" />
           ) : (
-            <XCircle size={20} className="text-red-400" />
+            <XCircle size={20} className="text-red-500" />
           )}
         </div>
       </div>
@@ -89,8 +89,8 @@ export function ISOView({ data }: ISOViewProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
-              <Package size={16} className="text-cyan-400" />
-              <span className="text-white/80">
+              <Package size={16} className="text-sky-500" />
+              <span className="text-slate-700">
                 Section 2 — Circular Inputs
               </span>
               <Badge variant="secondary" className="ml-auto text-[10px]">
@@ -122,8 +122,8 @@ export function ISOView({ data }: ISOViewProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
-              <Wrench size={16} className="text-purple-400" />
-              <span className="text-white/80">Section 3 — Better Use</span>
+              <Wrench size={16} className="text-violet-500" />
+              <span className="text-slate-700">Section 3 — Better Use</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -143,8 +143,8 @@ export function ISOView({ data }: ISOViewProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
-              <RotateCcw size={16} className="text-green-400" />
-              <span className="text-white/80">Section 5 — End of Life</span>
+              <RotateCcw size={16} className="text-emerald-500" />
+              <span className="text-slate-700">Section 5 — End of Life</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -162,13 +162,13 @@ export function ISOView({ data }: ISOViewProps) {
       {/* Summary Bar */}
       <motion.div
         variants={itemVariants}
-        className="flex items-center gap-4 p-4 glass rounded-lg"
+        className="flex items-center gap-4 p-4 bg-slate-50 border border-slate-200 rounded-lg"
       >
-        <ArrowUpCircle size={16} className="text-cyan-400" />
+        <ArrowUpCircle size={16} className="text-sky-500" />
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <span className="text-xs text-white/40">Statements Met:</span>
-            <span className="text-sm font-mono text-white/80">
+            <span className="text-xs text-slate-500">Statements Met:</span>
+            <span className="text-sm font-mono text-slate-700">
               {[
                 data.section_2_inputs.statement_2503_post_consumer,
                 data.section_2_inputs.statement_2301_reach_compliant,

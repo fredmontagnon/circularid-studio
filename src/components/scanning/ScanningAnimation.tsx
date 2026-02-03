@@ -5,11 +5,11 @@ import { Shield, Lock, Scan, Database, CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const SCAN_PHASES = [
-  { icon: Scan, label: "Parsing raw input...", color: "text-cyan-400" },
-  { icon: Database, label: "Extracting material composition...", color: "text-purple-400" },
-  { icon: Shield, label: "Checking AGEC compliance...", color: "text-orange-400" },
-  { icon: Lock, label: "Validating ISO 59040 PCDS...", color: "text-green-400" },
-  { icon: CheckCircle2, label: "Computing circularity score...", color: "text-cyan-300" },
+  { icon: Scan, label: "Parsing raw input...", color: "text-sky-600" },
+  { icon: Database, label: "Extracting material composition...", color: "text-violet-600" },
+  { icon: Shield, label: "Checking AGEC compliance...", color: "text-amber-600" },
+  { icon: Lock, label: "Validating ISO 59040 PCDS...", color: "text-emerald-600" },
+  { icon: CheckCircle2, label: "Computing circularity score...", color: "text-sky-500" },
 ];
 
 const DATA_LINES = [
@@ -77,24 +77,24 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-white/95 backdrop-blur-xl"
         >
           {/* Scan lines overlay */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <motion.div
-              className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent"
+              className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-sky-400/50 to-transparent"
               animate={{ top: ["-2px", "100%"] }}
               transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             />
             <motion.div
-              className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-400/30 to-transparent"
+              className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-violet-400/30 to-transparent"
               animate={{ top: ["100%", "-1px"] }}
               transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             />
           </div>
 
           {/* Grid pattern */}
-          <div className="absolute inset-0 bg-grid opacity-30" />
+          <div className="absolute inset-0 bg-grid opacity-50" />
 
           <div className="relative flex gap-12 max-w-5xl w-full px-8">
             {/* Left: Status phases */}
@@ -102,11 +102,11 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
               <motion.h2
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-2xl font-bold text-white mb-8 tracking-wide"
+                className="text-2xl font-bold text-slate-800 mb-8 tracking-wide"
               >
-                <span className="text-cyan-400">ARIANEE</span> PCDS ANALYSIS
+                <span className="text-sky-600">ARIANEE</span> PCDS ANALYSIS
                 {progress && (
-                  <span className="block text-sm font-normal text-white/40 mt-2">
+                  <span className="block text-sm font-normal text-slate-500 mt-2">
                     Processing {progress.total} products...
                   </span>
                 )}
@@ -114,7 +114,7 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
 
               {SCAN_PHASES.map((phase, idx) => {
                 const Icon = phase.icon;
-                const isActive = idx <= currentPhase;
+                const isActivePhase = idx <= currentPhase;
                 const isCurrent = idx === currentPhase;
 
                 return (
@@ -122,8 +122,8 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
                     key={idx}
                     initial={{ opacity: 0, x: -30 }}
                     animate={{
-                      opacity: isActive ? 1 : 0.2,
-                      x: isActive ? 0 : -30,
+                      opacity: isActivePhase ? 1 : 0.3,
+                      x: isActivePhase ? 0 : -30,
                     }}
                     transition={{ delay: idx * 0.3, duration: 0.4 }}
                     className={`flex items-center gap-3 ${phase.color}`}
@@ -138,12 +138,12 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
                     >
                       <Icon size={20} />
                     </motion.div>
-                    <span className="text-sm font-mono">{phase.label}</span>
+                    <span className="text-sm font-medium">{phase.label}</span>
                     {idx < currentPhase && (
                       <motion.span
                         initial={{ opacity: 0, scale: 0 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="text-green-400 ml-auto"
+                        className="text-emerald-500 ml-auto"
                       >
                         <CheckCircle2 size={16} />
                       </motion.span>
@@ -164,9 +164,9 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
               })}
 
               {/* Progress bar */}
-              <motion.div className="mt-8 h-1 rounded-full bg-white/10 overflow-hidden">
+              <motion.div className="mt-8 h-1.5 rounded-full bg-slate-200 overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-green-500 rounded-full"
+                  className="h-full bg-gradient-to-r from-sky-500 via-violet-500 to-emerald-500 rounded-full"
                   initial={{ width: "0%" }}
                   animate={{
                     width: `${((currentPhase + 1) / SCAN_PHASES.length) * 100}%`,
@@ -178,12 +178,12 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
 
             {/* Right: Data stream */}
             <div className="flex-1 relative">
-              <div className="glass rounded-lg p-4 h-[400px] overflow-hidden font-mono text-xs">
-                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/10">
+              <div className="bg-slate-900 rounded-lg p-4 h-[400px] overflow-hidden font-mono text-xs shadow-lg">
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-700">
                   <div className="w-2 h-2 rounded-full bg-red-500" />
                   <div className="w-2 h-2 rounded-full bg-yellow-500" />
                   <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <span className="text-white/30 text-[10px] ml-2">
+                  <span className="text-slate-500 text-[10px] ml-2">
                     compliance_engine.log
                   </span>
                 </div>
@@ -198,10 +198,10 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
                           transition={{ duration: 0.3 }}
                           className={`${
                             line.includes("CHECK")
-                              ? "text-green-400"
+                              ? "text-emerald-400"
                               : line.includes(">>")
-                              ? "text-cyan-400/70"
-                              : "text-white/50"
+                              ? "text-sky-400"
+                              : "text-slate-400"
                           }`}
                         >
                           {line}
@@ -212,7 +212,7 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
                   <motion.span
                     animate={{ opacity: [0, 1, 0] }}
                     transition={{ duration: 0.8, repeat: Infinity }}
-                    className="text-cyan-400"
+                    className="text-sky-400"
                   >
                     _
                   </motion.span>

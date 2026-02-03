@@ -43,25 +43,25 @@ function getAdvicePriority(advice: string): "high" | "medium" | "low" {
 
 const priorityColors = {
   high: {
-    border: "border-red-500/20",
-    bg: "bg-red-500/5",
-    hover: "hover:border-red-500/40 hover:bg-red-500/10",
-    icon: "text-red-400",
-    badge: "bg-red-500/20 text-red-300",
+    border: "border-red-200",
+    bg: "bg-red-50",
+    hover: "hover:border-red-300 hover:bg-red-100",
+    icon: "text-red-500",
+    badge: "bg-red-100 text-red-700",
   },
   medium: {
-    border: "border-orange-500/20",
-    bg: "bg-orange-500/5",
-    hover: "hover:border-orange-500/40 hover:bg-orange-500/10",
-    icon: "text-orange-400",
-    badge: "bg-orange-500/20 text-orange-300",
+    border: "border-amber-200",
+    bg: "bg-amber-50",
+    hover: "hover:border-amber-300 hover:bg-amber-100",
+    icon: "text-amber-500",
+    badge: "bg-amber-100 text-amber-700",
   },
   low: {
-    border: "border-cyan-500/20",
-    bg: "bg-cyan-500/5",
-    hover: "hover:border-cyan-500/40 hover:bg-cyan-500/10",
-    icon: "text-cyan-400",
-    badge: "bg-cyan-500/20 text-cyan-300",
+    border: "border-sky-200",
+    bg: "bg-sky-50",
+    hover: "hover:border-sky-300 hover:bg-sky-100",
+    icon: "text-sky-500",
+    badge: "bg-sky-100 text-sky-700",
   },
 };
 
@@ -75,9 +75,9 @@ export function GapAnalysis({ scoring }: GapAnalysisProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
-          <Lightbulb size={16} className="text-yellow-400" />
-          <span className="text-white/80">Gap Analysis & Recommendations</span>
-          <span className="ml-auto text-xs text-white/30 font-normal">
+          <Lightbulb size={16} className="text-amber-500" />
+          <span className="text-slate-700">Gap Analysis & Recommendations</span>
+          <span className="ml-auto text-xs text-slate-400 font-normal">
             {scoring.gap_analysis_advice.length} action
             {scoring.gap_analysis_advice.length !== 1 ? "s" : ""} needed
           </span>
@@ -90,13 +90,13 @@ export function GapAnalysis({ scoring }: GapAnalysisProps) {
             animate={{ opacity: 1 }}
             className="text-center py-8"
           >
-            <div className="text-green-400 mb-2">
+            <div className="text-emerald-500 mb-2">
               <TrendingUp size={32} className="mx-auto" />
             </div>
-            <p className="text-sm text-green-400/80">
+            <p className="text-sm text-emerald-600">
               All compliance criteria met!
             </p>
-            <p className="text-xs text-white/30 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               No gaps detected in your product data.
             </p>
           </motion.div>
@@ -121,7 +121,7 @@ export function GapAnalysis({ scoring }: GapAnalysisProps) {
                     className={`mt-0.5 flex-shrink-0 ${colors.icon}`}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-white/70 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       {advice}
                     </p>
                   </div>
@@ -132,7 +132,7 @@ export function GapAnalysis({ scoring }: GapAnalysisProps) {
                   </span>
                   <ArrowRight
                     size={12}
-                    className="text-white/20 flex-shrink-0 mt-0.5"
+                    className="text-slate-300 flex-shrink-0 mt-0.5"
                   />
                 </motion.div>
               );
@@ -146,10 +146,10 @@ export function GapAnalysis({ scoring }: GapAnalysisProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="mt-4 pt-3 border-t border-white/5 flex items-center gap-2"
+            className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2"
           >
-            <TrendingUp size={12} className="text-cyan-400/50" />
-            <span className="text-[10px] text-white/25">
+            <TrendingUp size={12} className="text-sky-400" />
+            <span className="text-[10px] text-slate-400">
               Resolving all gaps could increase your scores to 100%. High
               priority items have the greatest impact.
             </span>
