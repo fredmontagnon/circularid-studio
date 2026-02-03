@@ -28,7 +28,12 @@ const DATA_LINES = [
   ">> Compliance report ready.",
 ];
 
-export function ScanningAnimation({ isActive }: { isActive: boolean }) {
+interface ScanningAnimationProps {
+  isActive: boolean;
+  progress?: { current: number; total: number } | null;
+}
+
+export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps) {
   const [currentPhase, setCurrentPhase] = useState(0);
   const [visibleLines, setVisibleLines] = useState<number[]>([]);
 
@@ -99,7 +104,12 @@ export function ScanningAnimation({ isActive }: { isActive: boolean }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-2xl font-bold text-white mb-8 tracking-wide"
               >
-                <span className="text-cyan-400">CIRCULAR</span>ID ANALYSIS
+                <span className="text-cyan-400">ARIANEE</span> PCDS ANALYSIS
+                {progress && (
+                  <span className="block text-sm font-normal text-white/40 mt-2">
+                    Processing {progress.total} products...
+                  </span>
+                )}
               </motion.h2>
 
               {SCAN_PHASES.map((phase, idx) => {

@@ -5,14 +5,22 @@ import { motion } from "framer-motion";
 import { MagicDropzone } from "@/components/dropzone/MagicDropzone";
 import { ScanningAnimation } from "@/components/scanning/ScanningAnimation";
 import { Dashboard } from "@/components/dashboard/Dashboard";
+import { BatchDashboard } from "@/components/dashboard/BatchDashboard";
+import { isCSVFormat, parseCSV, extractProductName } from "@/lib/csv-parser";
 import type { ComplianceData } from "@/lib/schema";
 
-type AppState = "input" | "scanning" | "dashboard";
+type AppState = "input" | "scanning" | "dashboard" | "batch-dashboard";
 
 export interface ProductHistoryEntry {
   data: ComplianceData;
   rawInput: string;
   timestamp: Date;
+}
+
+interface BatchProductEntry {
+  data: ComplianceData;
+  rawInput: string;
+  productName: string;
 }
 
 export default function Home() {
@@ -22,46 +30,114 @@ export default function Home() {
   );
   const [rawInput, setRawInput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [productHistory, setProductHistory] = useState<ProductHistoryEntry[]>([]);
+  const [productHistory, setProductHistory] = useState<ProductHistoryEntry[]>(
+    []
+  );
+  const [batchProducts, setBatchProducts] = useState<BatchProductEntry[]>([]);
+  const [scanningProgress, setScanningProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
 
   const handleSubmit = useCallback(async (input: string) => {
     setRawInput(input);
     setError(null);
     setAppState("scanning");
+    setScanningProgress(null);
 
-    try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input }),
-      });
+    // Check if input is CSV format
+    const isCSV = isCSVFormat(input);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Analysis failed");
+    if (isCSV) {
+      // Batch processing mode
+      try {
+        const { headers, rows, rawRowStrings } = parseCSV(input);
+        const productNames = rows.map((row) =>
+          extractProductName(headers, row)
+        );
+
+        setScanningProgress({ current: 0, total: rows.length });
+
+        const response = await fetch("/api/analyze-batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rows: rawRowStrings, productNames }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Batch analysis failed");
+        }
+
+        const result = await response.json();
+
+        // Wait for scanning animation minimum duration
+        await new Promise((resolve) => setTimeout(resolve, 4000));
+
+        // Build batch products array from successful results
+        const successfulProducts: BatchProductEntry[] = result.results
+          .filter((r: { success: boolean }) => r.success)
+          .map(
+            (r: {
+              data: ComplianceData;
+              rawInput: string;
+              productName: string;
+            }) => ({
+              data: r.data,
+              rawInput: r.rawInput,
+              productName: r.productName,
+            })
+          );
+
+        if (successfulProducts.length === 0) {
+          throw new Error("No products could be analyzed from the CSV");
+        }
+
+        setBatchProducts(successfulProducts);
+        setAppState("batch-dashboard");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+        setAppState("input");
+        setScanningProgress(null);
       }
+    } else {
+      // Single product mode (existing flow)
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input }),
+        });
 
-      const result = await response.json();
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Analysis failed");
+        }
 
-      // Wait for scanning animation minimum duration
-      await new Promise((resolve) => setTimeout(resolve, 8000));
+        const result = await response.json();
 
-      setComplianceData(result.data);
-      setProductHistory((prev) => [
-        ...prev,
-        { data: result.data, rawInput: input, timestamp: new Date() },
-      ]);
-      setAppState("dashboard");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      setAppState("input");
+        // Wait for scanning animation minimum duration
+        await new Promise((resolve) => setTimeout(resolve, 8000));
+
+        setComplianceData(result.data);
+        setProductHistory((prev) => [
+          ...prev,
+          { data: result.data, rawInput: input, timestamp: new Date() },
+        ]);
+        setAppState("dashboard");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+        setAppState("input");
+      }
     }
   }, []);
 
   const handleReset = useCallback(() => {
     setComplianceData(null);
+    setBatchProducts([]);
     setRawInput("");
     setError(null);
+    setScanningProgress(null);
     setAppState("input");
   }, []);
 
@@ -74,17 +150,17 @@ export default function Home() {
       </div>
 
       {/* Scanning Overlay */}
-      <ScanningAnimation isActive={appState === "scanning"} />
+      <ScanningAnimation
+        isActive={appState === "scanning"}
+        progress={scanningProgress}
+      />
 
       {/* Content */}
       <div className="relative z-10">
         {appState === "input" && (
           <div className="flex items-center justify-center min-h-screen px-4">
             <div className="w-full">
-              <MagicDropzone
-                onSubmit={handleSubmit}
-                isLoading={false}
-              />
+              <MagicDropzone onSubmit={handleSubmit} isLoading={false} />
               {error && (
                 <div className="max-w-3xl mx-auto mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-sm text-center">
                   {error}
@@ -107,6 +183,16 @@ export default function Home() {
               onReset={handleReset}
               productHistory={productHistory}
             />
+          </motion.div>
+        )}
+
+        {appState === "batch-dashboard" && batchProducts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <BatchDashboard products={batchProducts} onReset={handleReset} />
           </motion.div>
         )}
       </div>
