@@ -44,10 +44,11 @@ async function analyzeRow(
 
     if (!response.ok) {
       const errorBody = await response.text();
+      console.error(`API error for ${productName}:`, response.status, errorBody.substring(0, 200));
       return {
         success: false,
         productName,
-        error: `API error: ${errorBody}`,
+        error: `API error (${response.status}): ${errorBody.substring(0, 100)}`,
         rawInput: rowInput,
       };
     }
@@ -129,7 +130,14 @@ export async function POST(req: Request) {
       );
     }
 
-    const { rows, productNames }: BatchInput = await req.json();
+    const body = await req.json();
+    const { rows, productNames }: BatchInput = body;
+
+    console.log("Batch request received:", {
+      rowCount: rows?.length,
+      productNames: productNames?.slice(0, 3),
+      firstRow: rows?.[0]?.substring(0, 100),
+    });
 
     if (!rows || !Array.isArray(rows) || rows.length === 0) {
       return Response.json(
@@ -166,11 +174,19 @@ export async function POST(req: Request) {
       results.push(...batchResults);
     }
 
+    const successCount = results.filter((r) => r.success).length;
+    const failedCount = results.filter((r) => !r.success).length;
+
+    console.log("Batch complete:", { total: rows.length, success: successCount, failed: failedCount });
+    if (failedCount > 0) {
+      console.log("First failure:", results.find((r) => !r.success)?.error);
+    }
+
     return Response.json({
       success: true,
       total: rows.length,
-      processed: results.filter((r) => r.success).length,
-      failed: results.filter((r) => !r.success).length,
+      processed: successCount,
+      failed: failedCount,
       limited: rows.length > MAX_BATCH_SIZE,
       results,
     });

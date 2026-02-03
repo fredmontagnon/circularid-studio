@@ -91,12 +91,14 @@ export default function Home() {
 
         if (successfulProducts.length === 0) {
           // Get first error for debugging
-          const firstError = result.results.find(
-            (r: { success: boolean; error?: string }) => !r.success
-          );
-          const errorDetail = firstError?.error || "Unknown error";
+          const failedResults = result.results?.filter(
+            (r: { success: boolean }) => !r.success
+          ) || [];
+          const firstError = failedResults[0];
+          const errorDetail = firstError?.error || "No results returned";
+          console.error("Batch failed. Results:", JSON.stringify(result, null, 2));
           throw new Error(
-            `No products could be analyzed from the CSV. Error: ${errorDetail}`
+            `Batch analysis failed (${failedResults.length} errors). First error: ${errorDetail}`
           );
         }
 
