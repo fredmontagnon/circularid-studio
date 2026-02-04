@@ -18,9 +18,8 @@ import {
   Globe,
   BookOpen,
   FileSpreadsheet,
-  LayoutDashboard,
 } from "lucide-react";
-import type { ComplianceData } from "@/lib/schema";
+import type { ComplianceData, AGECCompliance, ISO59040PCDS } from "@/lib/schema";
 
 interface ProductEntry {
   data: ComplianceData;
@@ -33,10 +32,186 @@ interface BatchDashboardProps {
   onReset: () => void;
 }
 
-export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
+// Helper to recalculate scores after edits
+function recalculateScores(data: ComplianceData): ComplianceData {
+  const agec = data.agec_compliance;
+  const iso = data.iso_59040_pcds;
+
+  // Calculate data completeness (count non-null fields)
+  let filledFields = 0;
+  let totalFields = 0;
+
+  // Traceability (3 fields)
+  totalFields += 3;
+  if (agec.traceability.weaving_knitting_country) filledFields++;
+  if (agec.traceability.dyeing_printing_country) filledFields++;
+  if (agec.traceability.manufacturing_country) filledFields++;
+
+  // Material analysis (3 fields)
+  totalFields += 3;
+  filledFields += 3; // These are always filled (numbers)
+
+  // Recyclability (2 fields: boolean + blockers array)
+  totalFields += 2;
+  filledFields += 2;
+
+  // Hazardous substances (2 fields)
+  totalFields += 2;
+  filledFields += 2;
+
+  // ISO 59040 (4 statements)
+  totalFields += 4;
+  filledFields += 4;
+
+  const data_completeness_score = Math.round((filledFields / totalFields) * 100);
+
+  // Calculate circularity performance score (AGEC based)
+  let circularity_performance_score = 0;
+
+  // Traceability: +10pts per country known (max 30)
+  if (agec.traceability.weaving_knitting_country) circularity_performance_score += 10;
+  if (agec.traceability.dyeing_printing_country) circularity_performance_score += 10;
+  if (agec.traceability.manufacturing_country) circularity_performance_score += 10;
+
+  // Recyclability: +25pts if recyclable
+  if (agec.recyclability.is_majority_recyclable) circularity_performance_score += 25;
+
+  // No SVHC: +20pts
+  if (!agec.hazardous_substances.contains_svhc) circularity_performance_score += 20;
+
+  // Recycled content: +10pts if >0%, +5pts bonus if >25%
+  if (agec.material_analysis.recycled_content_percentage > 0) {
+    circularity_performance_score += 10;
+    if (agec.material_analysis.recycled_content_percentage > 25) {
+      circularity_performance_score += 5;
+    }
+  }
+
+  // No microplastic warning needed: +10pts
+  if (!agec.material_analysis.microplastic_warning_required) {
+    circularity_performance_score += 10;
+  }
+
+  // Generate gap analysis advice
+  const gap_analysis_advice: string[] = [];
+
+  if (!agec.traceability.weaving_knitting_country) {
+    gap_analysis_advice.push("Traçabilité manquante: Documenter le pays de tissage/tricotage");
+  }
+  if (!agec.traceability.dyeing_printing_country) {
+    gap_analysis_advice.push("Traçabilité manquante: Documenter le pays de teinture/impression");
+  }
+  if (!agec.traceability.manufacturing_country) {
+    gap_analysis_advice.push("Traçabilité manquante: Documenter le pays de confection");
+  }
+  if (!agec.recyclability.is_majority_recyclable) {
+    gap_analysis_advice.push("Recyclabilité: Revoir la conception pour permettre le recyclage fibre-à-fibre");
+  }
+  if (agec.hazardous_substances.contains_svhc) {
+    gap_analysis_advice.push("SVHC détecté: Éliminer les substances préoccupantes de la formulation");
+  }
+  if (agec.material_analysis.microplastic_warning_required) {
+    gap_analysis_advice.push("Microplastique: Réduire le % de fibres synthétiques sous 50%");
+  }
+  if (agec.material_analysis.recycled_content_percentage === 0) {
+    gap_analysis_advice.push("Contenu recyclé: Intégrer des matières recyclées dans la composition");
+  }
+
+  return {
+    ...data,
+    meta_scoring: {
+      data_completeness_score,
+      circularity_performance_score,
+      gap_analysis_advice,
+    },
+  };
+}
+
+export function BatchDashboard({ products: initialProducts, onReset }: BatchDashboardProps) {
+  // Manage products state to allow editing
+  const [products, setProducts] = useState<ProductEntry[]>(initialProducts);
+
   // null = show summary, number = show product detail
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const selectedProduct = selectedIndex !== null ? products[selectedIndex] : null;
+
+  // Handler for AGEC updates
+  const handleAGECUpdate = (newAgecData: AGECCompliance) => {
+    if (selectedIndex === null) return;
+
+    const updatedProducts = [...products];
+    const currentProduct = updatedProducts[selectedIndex];
+
+    // Update AGEC data with recalculated microplastic warning
+    const updatedData: ComplianceData = {
+      ...currentProduct.data,
+      agec_compliance: {
+        ...newAgecData,
+        material_analysis: {
+          ...newAgecData.material_analysis,
+          microplastic_warning_required:
+            newAgecData.material_analysis.synthetic_fiber_percentage > 50,
+        },
+      },
+    };
+
+    // Also update ISO 59040 REACH compliance to match SVHC status
+    updatedData.iso_59040_pcds = {
+      ...updatedData.iso_59040_pcds,
+      section_2_inputs: {
+        ...updatedData.iso_59040_pcds.section_2_inputs,
+        statement_2301_reach_compliant: !newAgecData.hazardous_substances.contains_svhc,
+        statement_2503_post_consumer:
+          newAgecData.material_analysis.recycled_content_percentage > 25,
+      },
+    };
+
+    // Recalculate scores
+    const recalculatedData = recalculateScores(updatedData);
+
+    updatedProducts[selectedIndex] = {
+      ...currentProduct,
+      data: recalculatedData,
+    };
+
+    setProducts(updatedProducts);
+  };
+
+  // Handler for ISO 59040 updates
+  const handleISOUpdate = (newIsoData: ISO59040PCDS) => {
+    if (selectedIndex === null) return;
+
+    const updatedProducts = [...products];
+    const currentProduct = updatedProducts[selectedIndex];
+
+    // Update ISO data
+    const updatedData: ComplianceData = {
+      ...currentProduct.data,
+      iso_59040_pcds: newIsoData,
+    };
+
+    // Sync AGEC SVHC with REACH compliance
+    if (newIsoData.section_2_inputs.statement_2301_reach_compliant !==
+        !currentProduct.data.agec_compliance.hazardous_substances.contains_svhc) {
+      updatedData.agec_compliance = {
+        ...updatedData.agec_compliance,
+        hazardous_substances: {
+          ...updatedData.agec_compliance.hazardous_substances,
+          contains_svhc: !newIsoData.section_2_inputs.statement_2301_reach_compliant,
+        },
+      };
+    }
+
+    // Recalculate scores
+    const recalculatedData = recalculateScores(updatedData);
+
+    updatedProducts[selectedIndex] = {
+      ...currentProduct,
+      data: recalculatedData,
+    };
+
+    setProducts(updatedProducts);
+  };
 
   const handleExportAllJSON = () => {
     const exportData = products.map((p) => ({
@@ -190,7 +365,11 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
                     Loi française
                   </Badge>
                 </div>
-                <AGECView data={selectedProduct.data.agec_compliance} />
+                <AGECView
+                  data={selectedProduct.data.agec_compliance}
+                  onUpdate={handleAGECUpdate}
+                  editable={true}
+                />
               </div>
 
               {/* ISO 59040 PCDS Section */}
@@ -204,7 +383,11 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
                     Standard international
                   </Badge>
                 </div>
-                <ISOView data={selectedProduct.data.iso_59040_pcds} />
+                <ISOView
+                  data={selectedProduct.data.iso_59040_pcds}
+                  onUpdate={handleISOUpdate}
+                  editable={true}
+                />
               </div>
 
               {/* Gap Analysis / Recommendations */}
