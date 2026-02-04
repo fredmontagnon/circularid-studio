@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { useLanguage } from "@/lib/i18n";
 import {
   Package,
   ArrowUpCircle,
@@ -91,6 +92,7 @@ const itemVariants = {
 };
 
 export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
+  const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<ISO59040PCDS>(data);
 
@@ -120,7 +122,6 @@ export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
       animate="visible"
       className="space-y-4"
     >
-      {/* Edit Button */}
       {editable && (
         <div className="flex justify-end">
           {isEditing ? (
@@ -132,7 +133,7 @@ export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
                 className="gap-1 text-xs"
               >
                 <X size={12} />
-                Annuler
+                {t.cancel}
               </Button>
               <Button
                 variant="default"
@@ -141,7 +142,7 @@ export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
                 className="gap-1 text-xs"
               >
                 <Save size={12} />
-                Enregistrer
+                {t.save}
               </Button>
             </div>
           ) : (
@@ -152,7 +153,7 @@ export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
               className="gap-1 text-xs"
             >
               <Pencil size={12} />
-              Modifier
+              {t.modify}
             </Button>
           )}
         </div>
@@ -164,19 +165,17 @@ export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
               <Package size={16} className="text-sky-500" />
-              <span className="text-slate-700">
-                Section 2 — Entrées circulaires
-              </span>
+              <span className="text-slate-700">{t.section2CircularInputs}</span>
               <Badge variant="secondary" className="ml-auto text-[10px]">
-                ISO 59040 PCDS
+                {t.iso59040Pcds}
               </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <EditableStatementRow
               code="§2503"
-              label="Contenu recyclé post-consommation"
-              description="Le produit contient >25% de matière recyclée post-consommation"
+              label={t.postConsumerRecycled}
+              description={t.postConsumerRecycledDesc}
               value={currentData.section_2_inputs.statement_2503_post_consumer}
               delay={0.2}
               isEditing={isEditing}
@@ -192,8 +191,8 @@ export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
             />
             <EditableStatementRow
               code="§2301"
-              label="Conformité REACH"
-              description="Aucune substance extrêmement préoccupante au-dessus du seuil de 0.1%"
+              label={t.reachCompliant}
+              description={t.reachCompliantDesc}
               value={currentData.section_2_inputs.statement_2301_reach_compliant}
               delay={0.3}
               isEditing={isEditing}
@@ -217,14 +216,14 @@ export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
               <Wrench size={16} className="text-violet-500" />
-              <span className="text-slate-700">Section 3 — Meilleur usage</span>
+              <span className="text-slate-700">{t.section3BetterUse}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <EditableStatementRow
               code="§3000"
-              label="Réparable par non-expert"
-              description="Le produit est conçu pour être réparé par un consommateur standard"
+              label={t.repairableByNonExpert}
+              description={t.repairableByNonExpertDesc}
               value={currentData.section_3_better_use.statement_3000_repairable}
               delay={0.4}
               isEditing={isEditing}
@@ -248,14 +247,14 @@ export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
               <RotateCcw size={16} className="text-emerald-500" />
-              <span className="text-slate-700">Section 5 — Fin de vie</span>
+              <span className="text-slate-700">{t.section5EndOfLife}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <EditableStatementRow
               code="§5032"
-              label="Design boucle fermée"
-              description="Conçu pour le recyclage fibre-à-fibre (mono-matière ou facilement séparable)"
+              label={t.closedLoopDesign}
+              description={t.closedLoopDesignDesc}
               value={currentData.section_5_end_of_life.statement_5032_closed_loop}
               delay={0.5}
               isEditing={isEditing}
@@ -281,14 +280,14 @@ export function ISOView({ data, onUpdate, editable = true }: ISOViewProps) {
         <ArrowUpCircle size={16} className="text-sky-500" />
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500">Déclarations validées:</span>
+            <span className="text-xs text-slate-500">{t.statementsMet}</span>
             <span className="text-sm font-mono text-slate-700">
               {statementsCount} / 4
             </span>
           </div>
         </div>
         <Badge variant={statementsCount >= 3 ? "success" : "warning"}>
-          {statementsCount >= 3 ? "Bon niveau" : "À améliorer"}
+          {statementsCount >= 3 ? t.goodStanding : t.needsImprovement}
         </Badge>
       </motion.div>
     </motion.div>

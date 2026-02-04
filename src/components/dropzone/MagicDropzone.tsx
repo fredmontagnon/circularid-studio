@@ -12,6 +12,8 @@ import {
   BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLanguage } from "@/lib/i18n";
 
 interface MagicDropzoneProps {
   onSubmit: (input: string) => void;
@@ -19,6 +21,7 @@ interface MagicDropzoneProps {
 }
 
 export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
+  const { t } = useLanguage();
   const [textInput, setTextInput] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -83,17 +86,21 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
+      {/* Language Selector - Top Right */}
+      <div className="flex justify-end mb-4">
+        <LanguageSelector />
+      </div>
+
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold tracking-tight mb-3">
           <span className="bg-gradient-to-r from-sky-500 via-violet-500 to-sky-400 bg-clip-text text-transparent">
             Arianee
           </span>{" "}
-          <span className="text-slate-800">PCDS & AGEC Analyser</span>
+          <span className="text-slate-800">{t.appTitle}</span>
         </h1>
         <p className="text-slate-500 text-sm max-w-md mx-auto">
-          Drop any textile data — supplier emails, PDF content, raw descriptions
-          — and watch it transform into dual-compliance structured data.
+          {t.appSubtitle}
         </p>
       </div>
 
@@ -125,7 +132,7 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
             <textarea
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              placeholder={"Paste your textile product data here...\n\nExamples:\n\u2022 Supplier email content\n\u2022 PDF text extraction\n\u2022 Raw product descriptions\n\u2022 Material composition sheets"}
+              placeholder={t.dropzonePlaceholder}
               className="w-full h-48 bg-transparent border-0 text-slate-800 placeholder-slate-400 resize-none focus:outline-none focus:ring-0 text-sm font-mono leading-relaxed"
               disabled={isLoading}
             />
@@ -142,7 +149,7 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
           {/* Divider */}
           <div className="flex items-center gap-4 my-4">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
-            <span className="text-slate-400 text-xs font-medium">OR</span>
+            <span className="text-slate-400 text-xs font-medium">{t.or}</span>
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
           </div>
 
@@ -156,7 +163,7 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
               className="gap-2"
             >
               <ClipboardPaste size={14} />
-              Paste from Clipboard
+              {t.pasteFromClipboard}
             </Button>
 
             <Button
@@ -167,7 +174,7 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
               className="gap-2"
             >
               <FileSpreadsheet size={14} />
-              Upload CSV / TXT
+              {t.uploadCsvTxt}
             </Button>
 
             <input
@@ -195,12 +202,12 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
                 {isLoading ? (
                   <div className="flex items-center gap-2">
                     <Sparkles size={14} className="animate-spin" />
-                    Analyzing...
+                    {t.analyzing}
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <Upload size={14} />
-                    Analyze
+                    {t.analyze}
                   </div>
                 )}
               </Button>
@@ -218,14 +225,14 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
             className="gap-3 px-8 py-6 text-base font-medium border-2 border-sky-200 hover:border-sky-400 hover:bg-sky-50 text-slate-700"
           >
             <BookOpen size={20} className="text-sky-500" />
-            Nomenclature et score AGEC et PCDS
+            {t.nomenclatureButton}
           </Button>
         </Link>
       </div>
 
       {/* Hint */}
       <p className="text-center text-slate-400 text-xs mt-4">
-        Powered by Claude AI — ISO 59040 + AGEC dual-compliance engine
+        {t.poweredBy}
       </p>
     </div>
   );

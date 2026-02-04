@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/lib/i18n";
 import {
   BarChart3,
   CheckCircle2,
@@ -47,7 +48,6 @@ interface Stats {
   needsMicroplasticWarning: number;
   hasRecycledContent: number;
   hasHighRecycled: number;
-  // ISO 59040 stats
   iso59040Completeness: number;
   hasPostConsumerRecycled: number;
   hasReachCompliant: number;
@@ -56,6 +56,7 @@ interface Stats {
 }
 
 export function BatchSummary({ products }: BatchSummaryProps) {
+  const { t, language } = useLanguage();
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,6 +76,7 @@ export function BatchSummary({ products }: BatchSummaryProps) {
               data: p.data,
               productName: p.productName,
             })),
+            language,
           }),
         });
 
@@ -93,15 +95,19 @@ export function BatchSummary({ products }: BatchSummaryProps) {
     }
 
     fetchSummary();
-  }, [products]);
+  }, [products, language]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <Loader2 size={40} className="animate-spin text-sky-500 mx-auto mb-4" />
-          <p className="text-slate-500 text-sm">Génération du résumé en cours...</p>
-          <p className="text-slate-400 text-xs mt-1">Analyse par Claude AI</p>
+          <p className="text-slate-500 text-sm">
+            {language === "fr" ? "Génération du résumé en cours..." : "Generating summary..."}
+          </p>
+          <p className="text-slate-400 text-xs mt-1">
+            {language === "fr" ? "Analyse par Claude AI" : "Analysis by Claude AI"}
+          </p>
         </div>
       </div>
     );
@@ -132,32 +138,32 @@ export function BatchSummary({ products }: BatchSummaryProps) {
       <div className="mb-2">
         <div className="flex items-center gap-2 mb-3">
           <Scale size={16} className="text-sky-500" />
-          <span className="text-sm font-semibold text-slate-700">Conformité AGEC</span>
-          <Badge variant="secondary" className="text-[10px]">Loi française</Badge>
+          <span className="text-sm font-semibold text-slate-700">{t.agecCompliance}</span>
+          <Badge variant="secondary" className="text-[10px]">{t.frenchLaw}</Badge>
         </div>
         <div className="grid grid-cols-4 gap-4">
           <Card>
             <CardContent className="py-4 text-center">
               <div className="text-3xl font-bold text-slate-800">{stats.totalProducts}</div>
-              <div className="text-xs text-slate-500 mt-1">Produits analysés</div>
+              <div className="text-xs text-slate-500 mt-1">{t.productsAnalyzed}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="py-4 text-center">
               <div className="text-3xl font-bold text-sky-600">{stats.avgScore}%</div>
-              <div className="text-xs text-slate-500 mt-1">Score moyen AGEC</div>
+              <div className="text-xs text-slate-500 mt-1">{t.avgAgecScore}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="py-4 text-center">
               <div className="text-3xl font-bold text-emerald-600">{stats.conformeCount}</div>
-              <div className="text-xs text-slate-500 mt-1">Conformes (≥80%)</div>
+              <div className="text-xs text-slate-500 mt-1">{t.compliant}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="py-4 text-center">
               <div className="text-3xl font-bold text-red-600">{stats.aRevoirCount}</div>
-              <div className="text-xs text-slate-500 mt-1">À revoir (&lt;50%)</div>
+              <div className="text-xs text-slate-500 mt-1">{t.toReview}</div>
             </CardContent>
           </Card>
         </div>
@@ -167,32 +173,32 @@ export function BatchSummary({ products }: BatchSummaryProps) {
       <div className="mb-2">
         <div className="flex items-center gap-2 mb-3">
           <Globe size={16} className="text-emerald-500" />
-          <span className="text-sm font-semibold text-slate-700">ISO 59040 PCDS</span>
-          <Badge variant="secondary" className="text-[10px]">Standard international</Badge>
+          <span className="text-sm font-semibold text-slate-700">{t.iso59040Pcds}</span>
+          <Badge variant="secondary" className="text-[10px]">{t.internationalStandard}</Badge>
         </div>
         <div className="grid grid-cols-4 gap-4">
           <Card>
             <CardContent className="py-4 text-center">
               <div className="text-3xl font-bold text-emerald-600">{stats.iso59040Completeness}%</div>
-              <div className="text-xs text-slate-500 mt-1">Complétude PCDS</div>
+              <div className="text-xs text-slate-500 mt-1">{t.pcdsCompleteness}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="py-4 text-center">
               <div className="text-3xl font-bold text-slate-700">{stats.hasPostConsumerRecycled}</div>
-              <div className="text-xs text-slate-500 mt-1">§2503 Recyclé &gt;25%</div>
+              <div className="text-xs text-slate-500 mt-1">{t.recycledOver25}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="py-4 text-center">
               <div className="text-3xl font-bold text-slate-700">{stats.hasRepairable}</div>
-              <div className="text-xs text-slate-500 mt-1">§3000 Réparable</div>
+              <div className="text-xs text-slate-500 mt-1">{t.repairable}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="py-4 text-center">
               <div className="text-3xl font-bold text-slate-700">{stats.hasClosedLoop}</div>
-              <div className="text-xs text-slate-500 mt-1">§5032 Boucle fermée</div>
+              <div className="text-xs text-slate-500 mt-1">{t.closedLoop}</div>
             </CardContent>
           </Card>
         </div>
@@ -203,7 +209,7 @@ export function BatchSummary({ products }: BatchSummaryProps) {
         <CardContent className="py-4">
           <div className="flex items-center gap-2 mb-3">
             <BarChart3 size={16} className="text-slate-500" />
-            <span className="text-sm font-medium text-slate-700">Répartition des scores</span>
+            <span className="text-sm font-medium text-slate-700">{t.scoreDistribution}</span>
           </div>
           <div className="flex h-8 rounded-lg overflow-hidden">
             {stats.conformeCount > 0 && (
@@ -233,13 +239,13 @@ export function BatchSummary({ products }: BatchSummaryProps) {
           </div>
           <div className="flex justify-between mt-2 text-[10px] text-slate-400">
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded bg-emerald-500"></span> Conforme
+              <span className="w-2 h-2 rounded bg-emerald-500"></span> {language === "fr" ? "Conforme" : "Compliant"}
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded bg-amber-500"></span> Partiel
+              <span className="w-2 h-2 rounded bg-amber-500"></span> {t.partial}
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded bg-red-500"></span> À revoir
+              <span className="w-2 h-2 rounded bg-red-500"></span> {language === "fr" ? "À revoir" : "To Review"}
             </span>
           </div>
         </CardContent>
@@ -250,9 +256,9 @@ export function BatchSummary({ products }: BatchSummaryProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm">
             <Sparkles size={16} className="text-sky-500" />
-            <span className="text-slate-700">Synthèse globale</span>
+            <span className="text-slate-700">{t.globalSynthesis}</span>
             <Badge variant="secondary" className="ml-auto text-[10px]">
-              Généré par Claude AI
+              {t.generatedByAi}
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -267,7 +273,7 @@ export function BatchSummary({ products }: BatchSummaryProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
               <CheckCircle2 size={16} className="text-emerald-500" />
-              <span className="text-slate-700">Points forts</span>
+              <span className="text-slate-700">{t.strengths}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -292,7 +298,7 @@ export function BatchSummary({ products }: BatchSummaryProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
               <AlertTriangle size={16} className="text-amber-500" />
-              <span className="text-slate-700">Points d&apos;amélioration</span>
+              <span className="text-slate-700">{t.areasForImprovement}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -319,9 +325,9 @@ export function BatchSummary({ products }: BatchSummaryProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm">
             <Target size={16} className="text-violet-500" />
-            <span className="text-slate-700">Plan d&apos;action prioritaire</span>
+            <span className="text-slate-700">{t.priorityActionPlan}</span>
             <Badge className="ml-auto text-[10px] bg-violet-100 text-violet-700">
-              Pour atteindre 100%
+              {t.toReach100}
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -349,13 +355,13 @@ export function BatchSummary({ products }: BatchSummaryProps) {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Scale size={14} className="text-sky-500" />
-          <span className="text-xs font-medium text-slate-600">Détails AGEC</span>
+          <span className="text-xs font-medium text-slate-600">{t.detailsAgec}</span>
         </div>
         <div className="grid grid-cols-3 gap-4">
           <Card className="bg-slate-50">
             <CardContent className="py-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-500">Traçabilité incomplète</span>
+                <span className="text-xs text-slate-500">{t.incompleteTraceability}</span>
                 <span className="text-sm font-bold text-slate-700">
                   {stats.missingTraceability}/{stats.totalProducts}
                 </span>
@@ -365,7 +371,7 @@ export function BatchSummary({ products }: BatchSummaryProps) {
           <Card className="bg-slate-50">
             <CardContent className="py-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-500">Non recyclables</span>
+                <span className="text-xs text-slate-500">{t.notRecyclable}</span>
                 <span className="text-sm font-bold text-slate-700">
                   {stats.notRecyclable}/{stats.totalProducts}
                 </span>
@@ -375,7 +381,7 @@ export function BatchSummary({ products }: BatchSummaryProps) {
           <Card className="bg-slate-50">
             <CardContent className="py-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-500">Avert. microplastique</span>
+                <span className="text-xs text-slate-500">{t.microplasticWarningShort}</span>
                 <span className="text-sm font-bold text-slate-700">
                   {stats.needsMicroplasticWarning}/{stats.totalProducts}
                 </span>
@@ -389,14 +395,14 @@ export function BatchSummary({ products }: BatchSummaryProps) {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Globe size={14} className="text-emerald-500" />
-          <span className="text-xs font-medium text-slate-600">Détails ISO 59040 PCDS</span>
+          <span className="text-xs font-medium text-slate-600">{t.detailsIso}</span>
         </div>
         <div className="grid grid-cols-3 gap-4">
           <Card className="bg-slate-50">
             <CardContent className="py-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-500 flex items-center gap-1">
-                  <CheckCircle2 size={12} /> §2301 REACH conforme
+                  <CheckCircle2 size={12} /> {t.reachCompliantShort}
                 </span>
                 <span className="text-sm font-bold text-slate-700">
                   {stats.hasReachCompliant}/{stats.totalProducts}
@@ -408,7 +414,7 @@ export function BatchSummary({ products }: BatchSummaryProps) {
             <CardContent className="py-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-500 flex items-center gap-1">
-                  <Wrench size={12} /> §3000 Réparable
+                  <Wrench size={12} /> {t.repairable}
                 </span>
                 <span className="text-sm font-bold text-slate-700">
                   {stats.hasRepairable}/{stats.totalProducts}
@@ -420,7 +426,7 @@ export function BatchSummary({ products }: BatchSummaryProps) {
             <CardContent className="py-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-500 flex items-center gap-1">
-                  <Recycle size={12} /> §5032 Boucle fermée
+                  <Recycle size={12} /> {t.closedLoop}
                 </span>
                 <span className="text-sm font-bold text-slate-700">
                   {stats.hasClosedLoop}/{stats.totalProducts}

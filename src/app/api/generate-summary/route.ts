@@ -7,6 +7,7 @@ interface SummaryRequest {
     data: ComplianceData;
     productName: string;
   }>;
+  language?: "en" | "fr";
 }
 
 export async function POST(req: Request) {
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { products }: SummaryRequest = await req.json();
+    const { products, language = "en" }: SummaryRequest = await req.json();
 
     if (!products || products.length === 0) {
       return Response.json({ error: "No products provided" }, { status: 400 });
@@ -45,7 +46,6 @@ export async function POST(req: Request) {
     const hasHighRecycled = products.filter(p => p.data.agec_compliance.material_analysis.recycled_content_percentage > 25).length;
 
     // Count ISO 59040 PCDS completeness based on actual schema
-    // Section 2: Inputs (post-consumer recycled, REACH compliant)
     const hasPostConsumerRecycled = products.filter(p =>
       p.data.iso_59040_pcds.section_2_inputs.statement_2503_post_consumer
     ).length;
@@ -54,12 +54,10 @@ export async function POST(req: Request) {
       p.data.iso_59040_pcds.section_2_inputs.statement_2301_reach_compliant
     ).length;
 
-    // Section 3: Better Use (repairable)
     const hasRepairable = products.filter(p =>
       p.data.iso_59040_pcds.section_3_better_use.statement_3000_repairable
     ).length;
 
-    // Section 5: End of Life (closed-loop recycling)
     const hasClosedLoop = products.filter(p =>
       p.data.iso_59040_pcds.section_5_end_of_life.statement_5032_closed_loop
     ).length;
@@ -83,13 +81,9 @@ export async function POST(req: Request) {
       p.data.agec_compliance.recyclability.blockers.forEach(b => allBlockers.add(b));
     });
 
-    // Collect all gap advice
-    const allAdvice = new Set<string>();
-    products.forEach(p => {
-      p.data.meta_scoring.gap_analysis_advice.forEach(a => allAdvice.add(a));
-    });
-
-    const prompt = `Tu es un expert en conformité textile AGEC (loi française) et ISO 59040 PCDS (Product Circularity Data Sheet - standard international). Rédige un résumé exécutif en français pour un lot de ${totalProducts} produits analysés.
+    // Generate prompt based on language
+    const prompt = language === "fr"
+      ? `Tu es un expert en conformité textile AGEC (loi française) et ISO 59040 PCDS (Product Circularity Data Sheet - standard international). Rédige un résumé exécutif en français pour un lot de ${totalProducts} produits analysés.
 
 ## Données AGEC (loi française anti-gaspillage) :
 - Score moyen de conformité AGEC : ${avgScore}/100
@@ -129,6 +123,50 @@ Sois concis, professionnel et actionnable. Mentionne clairement quand un point c
 Réponds en JSON avec cette structure exacte :
 {
   "synthese": "texte",
+  "pointsForts": ["point1", "point2"],
+  "pointsAmelioration": ["point1", "point2"],
+  "planAction": ["action1", "action2"]
+}`
+      : `You are an expert in textile compliance for AGEC (French law) and ISO 59040 PCDS (Product Circularity Data Sheet - international standard). Write an executive summary in English for a batch of ${totalProducts} analyzed products.
+
+## AGEC Data (French anti-waste law):
+- Average AGEC compliance score: ${avgScore}/100
+- Compliant products (≥80%): ${conformeCount}
+- Partially compliant products (50-79%): ${partielCount}
+- Products to review (<50%): ${aRevoirCount}
+
+## AGEC Issues Detected:
+- Incomplete traceability (3 countries required): ${missingTraceability} products (out of ${totalProducts})
+- Not recyclable (fiber-to-fiber): ${notRecyclable} products
+- Contain SVHC: ${hasSVHC} products
+- Require microplastic warning: ${needsMicroplasticWarning} products
+- Recycled content >0%: ${hasRecycledContent} products
+- Recycled content >25%: ${hasHighRecycled} products
+
+## ISO 59040 PCDS Data (international circularity):
+- Average PCDS completeness score: ${iso59040Completeness}%
+- §2503 Post-consumer recycled content >25%: ${hasPostConsumerRecycled} products
+- §2301 REACH compliance: ${hasReachCompliant} products
+- §3000 Repairability: ${hasRepairable} products
+- §5032 Closed-loop recycling (fiber-to-fiber): ${hasClosedLoop} products
+
+## Recyclability Blockers Detected:
+${Array.from(allBlockers).slice(0, 10).join('\n') || 'None'}
+
+## Write a structured text with:
+
+1. **Summary** (2-3 sentences): Overview covering both AGEC AND ISO 59040
+
+2. **Strengths** (bullet list): What's good for AGEC and ISO 59040 (max 4 points)
+
+3. **Areas for Improvement** (bullet list): What's missing for AGEC and ISO 59040 (max 5 points)
+
+4. **Priority Action Plan** (numbered list): 3-5 concrete actions to reach 100% AGEC AND PCDS compliance, in order of priority/impact
+
+Be concise, professional and actionable. Clearly mention when a point concerns AGEC vs ISO 59040.
+Respond in JSON with this exact structure:
+{
+  "synthese": "text",
   "pointsForts": ["point1", "point2"],
   "pointsAmelioration": ["point1", "point2"],
   "planAction": ["action1", "action2"]

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { useLanguage } from "@/lib/i18n";
 import {
   MapPin,
   Recycle,
@@ -39,11 +40,13 @@ function EditableCountryBadge({
   label,
   isEditing,
   onChange,
+  missingLabel,
 }: {
   code: string | null;
   label: string;
   isEditing: boolean;
   onChange: (value: string | null) => void;
+  missingLabel: string;
 }) {
   return (
     <div className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
@@ -60,7 +63,7 @@ function EditableCountryBadge({
       ) : code ? (
         <Badge variant="default">{code}</Badge>
       ) : (
-        <Badge variant="danger">MISSING</Badge>
+        <Badge variant="danger">{missingLabel}</Badge>
       )}
     </div>
   );
@@ -80,11 +83,11 @@ const itemVariants = {
 };
 
 export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
+  const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<AGECCompliance>(data);
 
   const handleSave = () => {
-    // Recalculate microplastic warning based on synthetic percentage
     const updatedData = {
       ...editedData,
       material_analysis: {
@@ -111,7 +114,6 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
       animate="visible"
       className="space-y-4"
     >
-      {/* Edit Button */}
       {editable && (
         <div className="flex justify-end">
           {isEditing ? (
@@ -123,7 +125,7 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
                 className="gap-1 text-xs"
               >
                 <X size={12} />
-                Annuler
+                {t.cancel}
               </Button>
               <Button
                 variant="default"
@@ -132,7 +134,7 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
                 className="gap-1 text-xs"
               >
                 <Save size={12} />
-                Enregistrer
+                {t.save}
               </Button>
             </div>
           ) : (
@@ -143,7 +145,7 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
               className="gap-1 text-xs"
             >
               <Pencil size={12} />
-              Modifier
+              {t.modify}
             </Button>
           )}
         </div>
@@ -156,17 +158,18 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
                 <MapPin size={16} className="text-sky-500" />
-                <span className="text-slate-700">Traçabilité</span>
+                <span className="text-slate-700">{t.traceability}</span>
                 <Badge variant="secondary" className="ml-auto text-[10px]">
-                  AGEC Art. 13
+                  {t.agecArt13}
                 </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <EditableCountryBadge
                 code={currentData.traceability.weaving_knitting_country}
-                label="Tissage / Tricotage"
+                label={t.weavingKnitting}
                 isEditing={isEditing}
+                missingLabel={t.missing}
                 onChange={(value) =>
                   setEditedData({
                     ...editedData,
@@ -179,8 +182,9 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
               />
               <EditableCountryBadge
                 code={currentData.traceability.dyeing_printing_country}
-                label="Teinture / Impression"
+                label={t.dyeingPrinting}
                 isEditing={isEditing}
+                missingLabel={t.missing}
                 onChange={(value) =>
                   setEditedData({
                     ...editedData,
@@ -193,8 +197,9 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
               />
               <EditableCountryBadge
                 code={currentData.traceability.manufacturing_country}
-                label="Confection"
+                label={t.manufacturing}
                 isEditing={isEditing}
+                missingLabel={t.missing}
                 onChange={(value) =>
                   setEditedData({
                     ...editedData,
@@ -215,15 +220,15 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
                 <Recycle size={16} className="text-emerald-500" />
-                <span className="text-slate-700">Recyclabilité</span>
+                <span className="text-slate-700">{t.recyclability}</span>
                 <Badge variant="secondary" className="ml-auto text-[10px]">
-                  5 critères
+                  {t.fiveCriteria}
                 </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-slate-500">Majoritairement recyclable</span>
+                <span className="text-sm text-slate-500">{t.majorityRecyclable}</span>
                 {isEditing ? (
                   <Switch
                     checked={currentData.recyclability.is_majority_recyclable}
@@ -244,7 +249,7 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
               {currentData.recyclability.blockers.length > 0 && (
                 <div className="space-y-2">
                   <span className="text-xs text-red-500 font-medium">
-                    BLOQUANTS DÉTECTÉS:
+                    {t.blockersDetected}
                   </span>
                   {currentData.recyclability.blockers.map((blocker, idx) => (
                     <motion.div
@@ -254,10 +259,7 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
                       transition={{ delay: idx * 0.1 }}
                       className="flex items-start gap-2 text-xs text-red-600 bg-red-50 rounded-md px-3 py-2 border border-red-100"
                     >
-                      <AlertTriangle
-                        size={12}
-                        className="mt-0.5 flex-shrink-0"
-                      />
+                      <AlertTriangle size={12} className="mt-0.5 flex-shrink-0" />
                       {blocker}
                       {isEditing && (
                         <button
@@ -284,7 +286,7 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
               {currentData.recyclability.blockers.length === 0 && (
                 <div className="text-xs text-emerald-600 flex items-center gap-2">
                   <CheckCircle2 size={12} />
-                  Aucun bloquant détecté
+                  {t.noBlockersDetected}
                 </div>
               )}
             </CardContent>
@@ -297,12 +299,12 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
                 <FlaskConical size={16} className="text-violet-500" />
-                <span className="text-slate-700">Analyse matières</span>
+                <span className="text-slate-700">{t.materialAnalysis}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-500">Fibres synthétiques</span>
+                <span className="text-sm text-slate-500">{t.syntheticFiber}</span>
                 {isEditing ? (
                   <div className="flex items-center gap-1">
                     <Input
@@ -329,7 +331,6 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
                   </span>
                 )}
               </div>
-              {/* Synthetic bar */}
               <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                 <motion.div
                   className={`h-full rounded-full ${
@@ -346,7 +347,7 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-500">Contenu recyclé</span>
+                <span className="text-sm text-slate-500">{t.recycledContent}</span>
                 {isEditing ? (
                   <div className="flex items-center gap-1">
                     <Input
@@ -391,7 +392,7 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
                   className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-md px-3 py-2 border border-amber-200"
                 >
                   <AlertTriangle size={12} />
-                  Étiquette microplastique requise (synthétique &gt; 50%)
+                  {t.microplasticWarning}
                 </motion.div>
               )}
             </CardContent>
@@ -404,15 +405,15 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
                 <AlertTriangle size={16} className="text-amber-500" />
-                <span className="text-slate-700">Substances dangereuses</span>
+                <span className="text-slate-700">{t.hazardousSubstances}</span>
                 <Badge variant="secondary" className="ml-auto text-[10px]">
-                  REACH / SVHC
+                  {t.reachSvhc}
                 </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-slate-500">Contient SVHC</span>
+                <span className="text-sm text-slate-500">{t.containsSvhc}</span>
                 {isEditing ? (
                   <Switch
                     checked={currentData.hazardous_substances.contains_svhc}
@@ -463,7 +464,7 @@ export function AGECView({ data, onUpdate, editable = true }: AGECViewProps) {
               {!currentData.hazardous_substances.contains_svhc && (
                 <div className="text-xs text-emerald-600 flex items-center gap-2">
                   <CheckCircle2 size={12} />
-                  Aucun SVHC détecté au-dessus du seuil de 0.1%
+                  {t.noSvhcDetected}
                 </div>
               )}
             </CardContent>
