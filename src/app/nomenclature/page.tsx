@@ -416,9 +416,9 @@ export default function NomenclaturePage() {
             <div className="bg-slate-50 rounded-md p-3 space-y-1.5 text-[10px]">
               <div className="flex justify-between">
                 <span className="text-slate-500">
-                  Traçabilité complète (3/3 pays)
+                  Traçabilité (+10 pts par pays connu)
                 </span>
-                <span className="text-emerald-600 font-mono">+30 pts</span>
+                <span className="text-emerald-600 font-mono">max 30 pts</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">
@@ -434,13 +434,13 @@ export default function NomenclaturePage() {
                 <span className="text-slate-500">
                   Contenu recyclé présent (&gt;0%)
                 </span>
-                <span className="text-emerald-600 font-mono">+15 pts</span>
+                <span className="text-emerald-600 font-mono">+10 pts</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">
                   Bonus si contenu recyclé &gt;25%
                 </span>
-                <span className="text-emerald-600 font-mono">+10 pts</span>
+                <span className="text-emerald-600 font-mono">+5 pts</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">

@@ -1,68 +1,74 @@
 export function buildExtractionPrompt(rawInput: string): string {
-  return `You are a textile compliance analyst AI. Your task is to extract structured compliance data from unstructured textile product descriptions.
+  return `You are a textile compliance analyst AI. Your task is to extract structured compliance data from product data (often in CSV/DPP format from Arianee or similar systems).
 
 ## CRITICAL RULES — You MUST follow these:
 
-1. **The "Unknown" Rule:** If a data field cannot be determined from the input, set it to \`null\`. NEVER invent or guess data.
+1. **The "Unknown" Rule:** If a data field cannot be determined from the input, set it to \`null\`. NEVER invent or guess data. If only partial info is available, use what you have and leave the rest null.
 
-2. **Traceability Logic:**
-   - If the product is footwear/shoes: look for "Stitching", "Assembly", "Finishing" locations.
-   - If the product is clothing/apparel: look for "Weaving/Knitting", "Dyeing/Printing", "Manufacturing/Sewing" locations.
-   - Always use ISO 3166-1 alpha-2 country codes (e.g., "CN" for China, "TR" for Turkey, "FR" for France).
+2. **Field Mapping from Common CSV/DPP formats:**
+   - \`dpp.sku\` or \`sku\` → use as SKU
+   - \`dpp.EAN\` or \`EAN\` or \`GTIN\` → use as GTIN
+   - \`dpp.name\` or \`name\` or \`product_name\` → use as product name
+   - \`dpp.manufacturingCountry\` → this is the FINAL ASSEMBLY country (manufacturing_country). Use ISO alpha-2 codes (VNM→VN, CHN→CN, BGD→BD, TUR→TR, IND→IN, IDN→ID, PAK→PK, ITA→IT, PRT→PT, ESP→ES, FRA→FR, DEU→DE, GBR→GB, USA→US, MEX→MX, etc.)
+   - \`dpp.materials[].material\` + \`dpp.materials[].pourcentage\` → extract composition
+   - Look for weaving/knitting and dyeing/printing countries in description or transparencyItems. If not found, set to null.
 
-3. **The Microplastic Rule:** If synthetic fibers (polyester, nylon, acrylic, polypropylene, etc.) total > 50% of the composition, then \`microplastic_warning_required\` MUST be \`true\`. If 50% or below, it MUST be \`false\`.
+3. **Material Composition Analysis:**
+   - Parse ALL materials mentioned and their percentages
+   - Synthetic fibers = polyester, nylon, polyamide, acrylic, polypropylene, elastane, spandex, lycra
+   - If "Recycled Polyamide 62%" is found → synthetic_fiber_percentage = 62, recycled_content_percentage = 62
+   - If composition says "100% recycled polyester" → synthetic = 100%, recycled = 100%
+   - If multiple materials, sum the synthetic ones for synthetic_fiber_percentage
+   - IMPORTANT: "Recycled" materials are STILL synthetic if they're polyester/polyamide/nylon
 
-4. **Recyclability Assessment (French AGEC 5 criteria):**
-   - Collection infrastructure must exist for this product type
-   - Sorting infrastructure must exist
-   - No disruptors that block recycling (elastane > 3%, metal/plastic inseparable trims, multi-material bonded layers, coatings)
-   - Recycling yield must be > 50%
-   - Recycling must operate at industrial scale
-   - \`is_majority_recyclable\` = true ONLY if ALL 5 criteria are likely met.
-   - List ALL blockers in the \`blockers\` array.
+4. **The Microplastic Rule:** If synthetic fibers total > 50%, then \`microplastic_warning_required\` = true.
 
-5. **Hazardous Substances (REACH/SVHC):**
-   - Check input for mentions of: nickel, lead, chromium, cadmium, formaldehyde, PFAS, phthalates, azo dyes, antimony.
-   - If any are found or strongly implied (e.g., metal zippers often contain nickel), set \`contains_svhc\` to \`true\`.
+5. **PFAS and SVHC Detection:**
+   - If description mentions "PFAS-free", "without PFAS", "no PFAS" → contains_svhc = false (good sign)
+   - If description mentions PFAS without "free/without" → contains_svhc = true
+   - Certifications like "Bluesign", "OEKO-TEX Standard 100" suggest SVHC compliance → contains_svhc = false
+   - Metal zippers/rivets without certification → assume potential nickel → contains_svhc = true
+   - GORE-TEX ePE membranes marketed as PFAS-free → contains_svhc = false for membrane
 
-6. **ISO 59040 Statements:**
-   - \`statement_2503_post_consumer\`: true only if post-consumer recycled content is explicitly >25%.
-   - \`statement_2301_reach_compliant\`: true only if NO SVHC detected.
-   - \`statement_3000_repairable\`: true if the product design suggests easy repair (replaceable buttons, zippers, modular construction).
-   - \`statement_5032_closed_loop\`: true only if the product is mono-material or explicitly designed for fiber-to-fiber recycling.
+6. **Recyclability Assessment:**
+   - Multi-layer technical fabrics (GORE-TEX, membranes) = blocker (laminated layers not separable)
+   - DWR coatings = potential blocker unless biodegradable
+   - Elastane/spandex > 3% = blocker
+   - Mixed fibers (cotton + synthetic blend) = blocker for fiber-to-fiber recycling
+   - \`is_majority_recyclable\` = true ONLY for simple mono-material products without coatings/membranes
 
-7. **Scoring Rules:**
-   - \`data_completeness_score\`: Percentage of key fields that have data (not null). Key fields to count:
-     * Product identity: name (required), gtin, sku
-     * Traceability: weaving_country, dyeing_country, manufacturing_country
-     * Materials: synthetic_percentage (if composition mentioned), recycled_percentage
-     * Calculate: (filled fields / total applicable fields) * 100, rounded to integer.
+7. **ISO 59040 Statements:**
+   - \`statement_2503_post_consumer\`: true only if recycled content is explicitly >25% AND comes from post-consumer sources (not just post-industrial)
+   - \`statement_2301_reach_compliant\`: true if contains_svhc = false
+   - \`statement_3000_repairable\`: true if repair services are mentioned (e.g., "Repair my jacket" URL) or product has replaceable parts
+   - \`statement_5032_closed_loop\`: true only if mono-material AND no coatings/membranes. Technical outerwear with GORE-TEX = false.
 
-   - \`circularity_performance_score\`: AGEC compliance score based on regulatory requirements. Calculate as follows:
-     * Traceability complete (all 3 countries known) = +30pts (AGEC Article 13 mandatory)
-     * Recyclability criteria met (is_majority_recyclable = true) = +25pts
-     * No SVHC/hazardous substances detected = +20pts (REACH compliance)
-     * Recycled content present (>0%) = +15pts (bonus, +10 extra if >25%)
-     * No microplastic warning needed (synthetic ≤50%) = +10pts
-     * Maximum possible = 100pts if all criteria met with >25% recycled content
+8. **Scoring Rules:**
+   - \`data_completeness_score\`: Percentage of key fields with data:
+     * name (always 1 if present)
+     * gtin (1 if present)
+     * sku (1 if present)
+     * manufacturing_country (1 if present)
+     * weaving_knitting_country (1 if present)
+     * dyeing_printing_country (1 if present)
+     * material composition known (1 if any material %)
+     * Calculate: (filled fields / 7) * 100, rounded to integer.
 
-8. **Gap Analysis — ENRICHED ACTIONABLE ADVICE:**
-   For every \`null\` field or compliance gap, generate ONE **detailed, precise** advice string. Each advice MUST follow this enriched format:
+   - \`circularity_performance_score\`: AGEC compliance score:
+     * Traceability: +10pts per country known (max 30pts for all 3)
+     * Recyclability met = +25pts
+     * No SVHC = +20pts
+     * Recycled content >0% = +10pts, bonus +5pts if >25%
+     * No microplastic warning = +10pts
+     * Maximum = 100pts
 
-   **Format:** "Missing [Field Name]: [Problem description]. ACTION: [Precise step-by-step remedy with specific details]"
+9. **Gap Analysis:**
+   Generate advice ONLY for missing or problematic fields. Be specific:
+   - Missing weaving/dyeing country: "Traçabilité incomplète : Seul le pays de confection (XX) est connu. ACTION: Demander au fournisseur les pays de tissage et teinture. Référence: Décret AGEC 2022-748."
+   - Multi-material blocking recycling: "Recyclabilité bloquée : Membrane GORE-TEX multicouche non séparable. ACTION: Pour la fin de vie, orienter vers les programmes de reprise fabricant (Patagonia Worn Wear)."
+   - High synthetic but recycled: "Avertissement microplastique requis : 62% fibres synthétiques. NOTE: Bien que recyclées, les fibres polyamide relarguent des microplastiques au lavage."
 
-   **Rules for enriched advice:**
-   - For missing traceability countries: specify which supply chain actor to contact (weaver, dyer, CMT factory), what document to request (e.g., "Request a Certificate of Origin or manufacturing declaration from your Tier 2 supplier"), and reference the AGEC Décret 2022-748.
-   - For recyclability blockers: explain exactly which material or component is blocking, what the threshold is, and what alternative material/design could resolve it (e.g., "Replace elastane (currently 5%) with a biodegradable stretch alternative like Roica V550 to stay below the 3% threshold, or redesign with mechanical stretch construction").
-   - For SVHC/hazardous substance issues: name the specific substance detected, reference ECHA Candidate List, and suggest certified alternatives (e.g., "Nickel detected in metal zippers — switch to YKK Natulon or coil zippers with OEKO-TEX certification to eliminate nickel exposure").
-   - For missing recycled content: recommend specific certifications to obtain (GRS — Global Recycled Standard, RCS — Recycled Claim Standard), suggest recycled fiber suppliers (e.g., Repreve, Econyl, Renewcell), and note the >25% threshold for ISO 59040 Statement 2503.
-   - For repairability gaps: suggest specific design modifications (modular button attachments, accessible seam construction, snap-in zipper modules, including repair instructions with product).
-   - For closed-loop/mono-material gaps: explain fiber-to-fiber recycling requirements, suggest mono-material alternatives (100% cotton, 100% polyester, 100% wool), and reference existing recycling infrastructure (Worn Again, Renewcell Circulose, Eastman Naia).
-   - For missing GTIN/SKU: explain that GS1 registration is needed, reference the GS1 France portal for French market, and note this is mandatory for AGEC product identification.
-   - Always estimate the compliance impact: e.g., "Resolving this would add +15 points to your circularity score" or "This is required for AGEC Article 13 compliance".
-   - Keep each advice actionable and self-contained — the user should be able to act on it immediately without further research.
-
-## EXACT OUTPUT JSON SCHEMA — You MUST return this exact structure:
+## EXACT OUTPUT JSON SCHEMA:
 
 {
   "product_identity": {
