@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AGECView } from "./AGECView";
-// ScoreRing removed - scores shown in sidebar only
 import { ISOView } from "./ISOView";
 import { GapAnalysis } from "./GapAnalysis";
 import { ProductListSidebar } from "./ProductListSidebar";
+import { BatchSummary } from "./BatchSummary";
 import {
   ArrowLeft,
   Download,
@@ -18,6 +18,7 @@ import {
   Globe,
   BookOpen,
   FileSpreadsheet,
+  LayoutDashboard,
 } from "lucide-react";
 import type { ComplianceData } from "@/lib/schema";
 
@@ -33,8 +34,9 @@ interface BatchDashboardProps {
 }
 
 export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedProduct = products[selectedIndex];
+  // null = show summary, number = show product detail
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const selectedProduct = selectedIndex !== null ? products[selectedIndex] : null;
 
   const handleExportAllJSON = () => {
     const exportData = products.map((p) => ({
@@ -54,6 +56,7 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
   };
 
   const handleExportSelectedJSON = () => {
+    if (!selectedProduct) return;
     const blob = new Blob([JSON.stringify(selectedProduct.data, null, 2)], {
       type: "application/json",
     });
@@ -66,8 +69,6 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
     a.click();
     URL.revokeObjectURL(url);
   };
-
-  if (!selectedProduct) return null;
 
   return (
     <motion.div
@@ -85,16 +86,16 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={onReset} className="gap-2">
             <ArrowLeft size={14} />
-            New Analysis
+            Nouvelle analyse
           </Button>
           <div className="h-6 w-px bg-slate-200" />
           <div className="flex items-center gap-2">
             <FileSpreadsheet size={18} className="text-sky-500" />
             <span className="text-sm font-medium text-slate-700">
-              Batch Analysis
+              Analyse par lot
             </span>
             <Badge variant="default" className="text-[10px]">
-              {products.length} products
+              {products.length} produits
             </Badge>
           </div>
         </div>
@@ -112,7 +113,7 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
             className="gap-2"
           >
             <Download size={14} />
-            Export All
+            Exporter tout
           </Button>
         </div>
       </motion.div>
@@ -133,89 +134,97 @@ export function BatchDashboard({ products, onReset }: BatchDashboardProps) {
           />
         </motion.div>
 
-        {/* Right Panel: Selected Product Detail */}
+        {/* Right Panel: Summary or Product Detail */}
         <motion.div
-          key={selectedIndex}
+          key={selectedIndex ?? "summary"}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="flex-1 overflow-y-auto px-6 py-6 bg-slate-50"
+          className="flex-1 overflow-y-auto bg-slate-50"
         >
-          {/* Product Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
-                <Package size={20} className="text-sky-500" />
-                {selectedProduct.data.product_identity.name}
-              </h2>
-              <div className="flex items-center gap-2 mt-1">
-                {selectedProduct.data.product_identity.sku && (
+          {selectedIndex === null ? (
+            // Summary View
+            <BatchSummary products={products} />
+          ) : selectedProduct ? (
+            // Product Detail View
+            <div className="px-6 py-6">
+              {/* Product Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                    <Package size={20} className="text-sky-500" />
+                    {selectedProduct.data.product_identity.name}
+                  </h2>
+                  <div className="flex items-center gap-2 mt-1">
+                    {selectedProduct.data.product_identity.sku && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        SKU: {selectedProduct.data.product_identity.sku}
+                      </Badge>
+                    )}
+                    {selectedProduct.data.product_identity.gtin && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        GTIN: {selectedProduct.data.product_identity.gtin}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportSelectedJSON}
+                  className="gap-2"
+                >
+                  <Download size={14} />
+                  Exporter
+                </Button>
+              </div>
+
+              {/* AGEC Compliance Section */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Scale size={18} className="text-sky-500" />
+                  <h3 className="text-lg font-semibold text-slate-700">
+                    Conformité AGEC
+                  </h3>
                   <Badge variant="secondary" className="text-[10px]">
-                    SKU: {selectedProduct.data.product_identity.sku}
+                    Loi française
                   </Badge>
-                )}
-                {selectedProduct.data.product_identity.gtin && (
+                </div>
+                <AGECView data={selectedProduct.data.agec_compliance} />
+              </div>
+
+              {/* ISO 59040 PCDS Section */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Globe size={18} className="text-emerald-500" />
+                  <h3 className="text-lg font-semibold text-slate-700">
+                    ISO 59040 PCDS
+                  </h3>
                   <Badge variant="secondary" className="text-[10px]">
-                    GTIN: {selectedProduct.data.product_identity.gtin}
+                    Standard international
                   </Badge>
-                )}
+                </div>
+                <ISOView data={selectedProduct.data.iso_59040_pcds} />
+              </div>
+
+              {/* Gap Analysis / Recommendations */}
+              <div className="mb-6">
+                <GapAnalysis scoring={selectedProduct.data.meta_scoring} />
+              </div>
+
+              {/* Raw Input Preview */}
+              <div className="bg-white border border-slate-200 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                    Données source
+                  </span>
+                </div>
+                <pre className="text-xs text-slate-500 font-mono whitespace-pre-wrap max-h-24 overflow-auto">
+                  {selectedProduct.rawInput}
+                </pre>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExportSelectedJSON}
-              className="gap-2"
-            >
-              <Download size={14} />
-              Export
-            </Button>
-          </div>
-
-          {/* AGEC Compliance Section */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Scale size={18} className="text-sky-500" />
-              <h3 className="text-lg font-semibold text-slate-700">
-                Conformité AGEC
-              </h3>
-              <Badge variant="secondary" className="text-[10px]">
-                Loi française
-              </Badge>
-            </div>
-            <AGECView data={selectedProduct.data.agec_compliance} />
-          </div>
-
-          {/* ISO 59040 PCDS Section */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Globe size={18} className="text-emerald-500" />
-              <h3 className="text-lg font-semibold text-slate-700">
-                ISO 59040 PCDS
-              </h3>
-              <Badge variant="secondary" className="text-[10px]">
-                Standard international
-              </Badge>
-            </div>
-            <ISOView data={selectedProduct.data.iso_59040_pcds} />
-          </div>
-
-          {/* Gap Analysis / Recommendations */}
-          <div className="mb-6">
-            <GapAnalysis scoring={selectedProduct.data.meta_scoring} />
-          </div>
-
-          {/* Raw Input Preview */}
-          <div className="bg-white border border-slate-200 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
-                Original Input
-              </span>
-            </div>
-            <pre className="text-xs text-slate-500 font-mono whitespace-pre-wrap max-h-24 overflow-auto">
-              {selectedProduct.rawInput}
-            </pre>
-          </div>
+          ) : null}
         </motion.div>
       </div>
     </motion.div>

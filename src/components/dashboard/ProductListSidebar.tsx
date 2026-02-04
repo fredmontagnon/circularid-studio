@@ -2,11 +2,13 @@
 
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Package,
   CheckCircle2,
   AlertTriangle,
   ChevronRight,
+  LayoutDashboard,
 } from "lucide-react";
 import type { ComplianceData } from "@/lib/schema";
 
@@ -18,8 +20,8 @@ interface ProductEntry {
 
 interface ProductListSidebarProps {
   products: ProductEntry[];
-  selectedIndex: number;
-  onSelectProduct: (index: number) => void;
+  selectedIndex: number | null;
+  onSelectProduct: (index: number | null) => void;
 }
 
 function getScoreColor(score: number): string {
@@ -41,14 +43,26 @@ export function ProductListSidebar({
 }: ProductListSidebarProps) {
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
+      {/* Header with Summary Button */}
       <div className="p-4 border-b border-slate-200">
+        <Button
+          variant={selectedIndex === null ? "default" : "outline"}
+          size="sm"
+          onClick={() => onSelectProduct(null)}
+          className="w-full justify-start gap-2 mb-3"
+        >
+          <LayoutDashboard size={14} />
+          <span className="font-medium">Résumé global</span>
+          <Badge variant="secondary" className="ml-auto text-[9px]">
+            {products.length} produits
+          </Badge>
+        </Button>
         <h2 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
           <Package size={16} className="text-sky-500" />
-          Products ({products.length})
+          Produits
         </h2>
         <p className="text-[10px] text-slate-400 mt-1">
-          Click a product to view its compliance data
+          Cliquez sur un produit pour voir sa fiche
         </p>
       </div>
 
