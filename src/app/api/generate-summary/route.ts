@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     const partielCount = products.filter(p => p.data.meta_scoring.circularity_performance_score >= 50 && p.data.meta_scoring.circularity_performance_score < 80).length;
     const aRevoirCount = products.filter(p => p.data.meta_scoring.circularity_performance_score < 50).length;
 
-    // Count issues
+    // Count AGEC issues
     const missingTraceability = products.filter(p =>
       !p.data.agec_compliance.traceability.weaving_knitting_country ||
       !p.data.agec_compliance.traceability.dyeing_printing_country ||
@@ -43,6 +43,39 @@ export async function POST(req: Request) {
     const needsMicroplasticWarning = products.filter(p => p.data.agec_compliance.material_analysis.microplastic_warning_required).length;
     const hasRecycledContent = products.filter(p => p.data.agec_compliance.material_analysis.recycled_content_percentage > 0).length;
     const hasHighRecycled = products.filter(p => p.data.agec_compliance.material_analysis.recycled_content_percentage > 25).length;
+
+    // Count ISO 59040 PCDS completeness based on actual schema
+    // Section 2: Inputs (post-consumer recycled, REACH compliant)
+    const hasPostConsumerRecycled = products.filter(p =>
+      p.data.iso_59040_pcds.section_2_inputs.statement_2503_post_consumer
+    ).length;
+
+    const hasReachCompliant = products.filter(p =>
+      p.data.iso_59040_pcds.section_2_inputs.statement_2301_reach_compliant
+    ).length;
+
+    // Section 3: Better Use (repairable)
+    const hasRepairable = products.filter(p =>
+      p.data.iso_59040_pcds.section_3_better_use.statement_3000_repairable
+    ).length;
+
+    // Section 5: End of Life (closed-loop recycling)
+    const hasClosedLoop = products.filter(p =>
+      p.data.iso_59040_pcds.section_5_end_of_life.statement_5032_closed_loop
+    ).length;
+
+    // Calculate ISO 59040 completeness percentage (4 statements total)
+    const iso59040Completeness = Math.round(
+      products.reduce((sum, p) => {
+        let score = 0;
+        const total = 4;
+        if (p.data.iso_59040_pcds.section_2_inputs.statement_2503_post_consumer) score++;
+        if (p.data.iso_59040_pcds.section_2_inputs.statement_2301_reach_compliant) score++;
+        if (p.data.iso_59040_pcds.section_3_better_use.statement_3000_repairable) score++;
+        if (p.data.iso_59040_pcds.section_5_end_of_life.statement_5032_closed_loop) score++;
+        return sum + (score / total) * 100;
+      }, 0) / totalProducts
+    );
 
     // Collect all unique blockers
     const allBlockers = new Set<string>();
@@ -56,36 +89,43 @@ export async function POST(req: Request) {
       p.data.meta_scoring.gap_analysis_advice.forEach(a => allAdvice.add(a));
     });
 
-    const prompt = `Tu es un expert en conformité textile AGEC et ISO 59040. Rédige un résumé exécutif en français pour un lot de ${totalProducts} produits analysés.
+    const prompt = `Tu es un expert en conformité textile AGEC (loi française) et ISO 59040 PCDS (Product Circularity Data Sheet - standard international). Rédige un résumé exécutif en français pour un lot de ${totalProducts} produits analysés.
 
-## Données agrégées :
+## Données AGEC (loi française anti-gaspillage) :
 - Score moyen de conformité AGEC : ${avgScore}/100
 - Produits conformes (≥80%) : ${conformeCount}
 - Produits partiellement conformes (50-79%) : ${partielCount}
 - Produits à revoir (<50%) : ${aRevoirCount}
 
-## Problèmes détectés :
-- Traçabilité incomplète : ${missingTraceability} produits (sur ${totalProducts})
-- Non recyclables : ${notRecyclable} produits
+## Problèmes AGEC détectés :
+- Traçabilité incomplète (3 pays requis) : ${missingTraceability} produits (sur ${totalProducts})
+- Non recyclables (fibre-à-fibre) : ${notRecyclable} produits
 - Contiennent des SVHC : ${hasSVHC} produits
 - Nécessitent avertissement microplastique : ${needsMicroplasticWarning} produits
 - Contenu recyclé >0% : ${hasRecycledContent} produits
 - Contenu recyclé >25% : ${hasHighRecycled} produits
+
+## Données ISO 59040 PCDS (circularité internationale) :
+- Score moyen de complétude PCDS : ${iso59040Completeness}%
+- §2503 Contenu recyclé post-consommation >25% : ${hasPostConsumerRecycled} produits
+- §2301 Conformité REACH : ${hasReachCompliant} produits
+- §3000 Réparabilité : ${hasRepairable} produits
+- §5032 Recyclage en boucle fermée (fibre-à-fibre) : ${hasClosedLoop} produits
 
 ## Blockers de recyclabilité détectés :
 ${Array.from(allBlockers).slice(0, 10).join('\n') || 'Aucun'}
 
 ## Rédige un texte structuré avec :
 
-1. **Synthèse** (2-3 phrases) : Vue d'ensemble de la conformité du lot
+1. **Synthèse** (2-3 phrases) : Vue d'ensemble couvrant AGEC ET ISO 59040
 
-2. **Points forts** (liste à puces) : Ce qui est bien (max 4 points)
+2. **Points forts** (liste à puces) : Ce qui est bien pour AGEC et ISO 59040 (max 4 points)
 
-3. **Points d'amélioration** (liste à puces) : Ce qui manque ou pose problème (max 5 points)
+3. **Points d'amélioration** (liste à puces) : Ce qui manque pour AGEC et ISO 59040 (max 5 points)
 
-4. **Plan d'action prioritaire** (liste numérotée) : 3-5 actions concrètes pour atteindre 100% de conformité, par ordre de priorité/impact
+4. **Plan d'action prioritaire** (liste numérotée) : 3-5 actions concrètes pour atteindre 100% de conformité AGEC ET PCDS, par ordre de priorité/impact
 
-Sois concis, professionnel et actionnable. Utilise des pourcentages quand pertinent.
+Sois concis, professionnel et actionnable. Mentionne clairement quand un point concerne AGEC vs ISO 59040.
 Réponds en JSON avec cette structure exacte :
 {
   "synthese": "texte",
@@ -152,6 +192,12 @@ Réponds en JSON avec cette structure exacte :
         needsMicroplasticWarning,
         hasRecycledContent,
         hasHighRecycled,
+        // ISO 59040 stats
+        iso59040Completeness,
+        hasPostConsumerRecycled,
+        hasReachCompliant,
+        hasRepairable,
+        hasClosedLoop,
       },
     });
   } catch (error) {

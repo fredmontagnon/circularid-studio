@@ -8,10 +8,13 @@ import {
   BarChart3,
   CheckCircle2,
   AlertTriangle,
-  TrendingUp,
   Sparkles,
   Target,
   Loader2,
+  Globe,
+  Scale,
+  Recycle,
+  Wrench,
 } from "lucide-react";
 import type { ComplianceData } from "@/lib/schema";
 
@@ -44,6 +47,12 @@ interface Stats {
   needsMicroplasticWarning: number;
   hasRecycledContent: number;
   hasHighRecycled: number;
+  // ISO 59040 stats
+  iso59040Completeness: number;
+  hasPostConsumerRecycled: number;
+  hasReachCompliant: number;
+  hasRepairable: number;
+  hasClosedLoop: number;
 }
 
 export function BatchSummary({ products }: BatchSummaryProps) {
@@ -119,32 +128,74 @@ export function BatchSummary({ products }: BatchSummaryProps) {
       animate={{ opacity: 1, y: 0 }}
       className="p-6 space-y-6"
     >
-      {/* Header Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="py-4 text-center">
-            <div className="text-3xl font-bold text-slate-800">{stats.totalProducts}</div>
-            <div className="text-xs text-slate-500 mt-1">Produits analysés</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-4 text-center">
-            <div className="text-3xl font-bold text-sky-600">{stats.avgScore}%</div>
-            <div className="text-xs text-slate-500 mt-1">Score moyen AGEC</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-4 text-center">
-            <div className="text-3xl font-bold text-emerald-600">{stats.conformeCount}</div>
-            <div className="text-xs text-slate-500 mt-1">Conformes (≥80%)</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="py-4 text-center">
-            <div className="text-3xl font-bold text-red-600">{stats.aRevoirCount}</div>
-            <div className="text-xs text-slate-500 mt-1">À revoir (&lt;50%)</div>
-          </CardContent>
-        </Card>
+      {/* Header Stats - AGEC */}
+      <div className="mb-2">
+        <div className="flex items-center gap-2 mb-3">
+          <Scale size={16} className="text-sky-500" />
+          <span className="text-sm font-semibold text-slate-700">Conformité AGEC</span>
+          <Badge variant="secondary" className="text-[10px]">Loi française</Badge>
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="py-4 text-center">
+              <div className="text-3xl font-bold text-slate-800">{stats.totalProducts}</div>
+              <div className="text-xs text-slate-500 mt-1">Produits analysés</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4 text-center">
+              <div className="text-3xl font-bold text-sky-600">{stats.avgScore}%</div>
+              <div className="text-xs text-slate-500 mt-1">Score moyen AGEC</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4 text-center">
+              <div className="text-3xl font-bold text-emerald-600">{stats.conformeCount}</div>
+              <div className="text-xs text-slate-500 mt-1">Conformes (≥80%)</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4 text-center">
+              <div className="text-3xl font-bold text-red-600">{stats.aRevoirCount}</div>
+              <div className="text-xs text-slate-500 mt-1">À revoir (&lt;50%)</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Header Stats - ISO 59040 */}
+      <div className="mb-2">
+        <div className="flex items-center gap-2 mb-3">
+          <Globe size={16} className="text-emerald-500" />
+          <span className="text-sm font-semibold text-slate-700">ISO 59040 PCDS</span>
+          <Badge variant="secondary" className="text-[10px]">Standard international</Badge>
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="py-4 text-center">
+              <div className="text-3xl font-bold text-emerald-600">{stats.iso59040Completeness}%</div>
+              <div className="text-xs text-slate-500 mt-1">Complétude PCDS</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4 text-center">
+              <div className="text-3xl font-bold text-slate-700">{stats.hasPostConsumerRecycled}</div>
+              <div className="text-xs text-slate-500 mt-1">§2503 Recyclé &gt;25%</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4 text-center">
+              <div className="text-3xl font-bold text-slate-700">{stats.hasRepairable}</div>
+              <div className="text-xs text-slate-500 mt-1">§3000 Réparable</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4 text-center">
+              <div className="text-3xl font-bold text-slate-700">{stats.hasClosedLoop}</div>
+              <div className="text-xs text-slate-500 mt-1">§5032 Boucle fermée</div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Score Distribution Bar */}
@@ -294,38 +345,90 @@ export function BatchSummary({ products }: BatchSummaryProps) {
         </CardContent>
       </Card>
 
-      {/* Quick Stats Grid */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="bg-slate-50">
-          <CardContent className="py-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500">Traçabilité incomplète</span>
-              <span className="text-sm font-bold text-slate-700">
-                {stats.missingTraceability}/{stats.totalProducts}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-slate-50">
-          <CardContent className="py-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500">Non recyclables</span>
-              <span className="text-sm font-bold text-slate-700">
-                {stats.notRecyclable}/{stats.totalProducts}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-slate-50">
-          <CardContent className="py-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-500">Avert. microplastique</span>
-              <span className="text-sm font-bold text-slate-700">
-                {stats.needsMicroplasticWarning}/{stats.totalProducts}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Quick Stats Grid - AGEC */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Scale size={14} className="text-sky-500" />
+          <span className="text-xs font-medium text-slate-600">Détails AGEC</span>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="bg-slate-50">
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500">Traçabilité incomplète</span>
+                <span className="text-sm font-bold text-slate-700">
+                  {stats.missingTraceability}/{stats.totalProducts}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-50">
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500">Non recyclables</span>
+                <span className="text-sm font-bold text-slate-700">
+                  {stats.notRecyclable}/{stats.totalProducts}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-50">
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500">Avert. microplastique</span>
+                <span className="text-sm font-bold text-slate-700">
+                  {stats.needsMicroplasticWarning}/{stats.totalProducts}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Quick Stats Grid - ISO 59040 */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Globe size={14} className="text-emerald-500" />
+          <span className="text-xs font-medium text-slate-600">Détails ISO 59040 PCDS</span>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="bg-slate-50">
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500 flex items-center gap-1">
+                  <CheckCircle2 size={12} /> §2301 REACH conforme
+                </span>
+                <span className="text-sm font-bold text-slate-700">
+                  {stats.hasReachCompliant}/{stats.totalProducts}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-50">
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500 flex items-center gap-1">
+                  <Wrench size={12} /> §3000 Réparable
+                </span>
+                <span className="text-sm font-bold text-slate-700">
+                  {stats.hasRepairable}/{stats.totalProducts}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-50">
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500 flex items-center gap-1">
+                  <Recycle size={12} /> §5032 Boucle fermée
+                </span>
+                <span className="text-sm font-bold text-slate-700">
+                  {stats.hasClosedLoop}/{stats.totalProducts}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </motion.div>
   );
