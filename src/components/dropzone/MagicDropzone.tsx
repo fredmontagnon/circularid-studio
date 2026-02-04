@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import Link from "next/link";
 import {
   Upload,
   FileText,
@@ -8,6 +9,7 @@ import {
   ClipboardPaste,
   X,
   FileSpreadsheet,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -205,6 +207,20 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Nomenclature Button */}
+      <div className="mt-8 text-center">
+        <Link href="/nomenclature">
+          <Button
+            variant="outline"
+            size="lg"
+            className="gap-3 px-8 py-6 text-base font-medium border-2 border-sky-200 hover:border-sky-400 hover:bg-sky-50 text-slate-700"
+          >
+            <BookOpen size={20} className="text-sky-500" />
+            Nomenclature et score AGEC et PCDS
+          </Button>
+        </Link>
       </div>
 
       {/* Hint */}
