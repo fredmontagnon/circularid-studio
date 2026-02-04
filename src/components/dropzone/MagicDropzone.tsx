@@ -232,7 +232,7 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
 
       {/* Hint */}
       <p className="text-center text-slate-400 text-xs mt-4">
-        {t.poweredBy}
+        {t.poweredByArianee}
       </p>
     </div>
   );

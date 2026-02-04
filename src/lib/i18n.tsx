@@ -12,7 +12,7 @@ interface Translations {
   uploadCsvTxt: string;
   analyze: string;
   analyzing: string;
-  poweredBy: string;
+  poweredByArianee: string;
   nomenclatureButton: string;
   dropzonePlaceholder: string;
   or: string;
@@ -133,7 +133,7 @@ const translations: Record<Language, Translations> = {
     uploadCsvTxt: "Upload CSV / TXT",
     analyze: "Analyze",
     analyzing: "Analyzing...",
-    poweredBy: "Powered by Claude AI — ISO 59040 + AGEC dual-compliance engine",
+    poweredByArianee: "Powered by Arianee — ISO 59040 + AGEC dual-compliance engine",
     nomenclatureButton: "Nomenclature and AGEC & PCDS scoring",
     dropzonePlaceholder: "Paste your textile product data here...\n\nExamples:\n• Supplier email content\n• PDF text extraction\n• Raw product descriptions\n• Material composition sheets",
     or: "OR",
@@ -252,7 +252,7 @@ const translations: Record<Language, Translations> = {
     uploadCsvTxt: "Charger CSV / TXT",
     analyze: "Analyser",
     analyzing: "Analyse en cours...",
-    poweredBy: "Propulsé par Claude AI — Moteur de conformité ISO 59040 + AGEC",
+    poweredByArianee: "Propulsé par Arianee — Moteur de conformité ISO 59040 + AGEC",
     nomenclatureButton: "Nomenclature et score AGEC et PCDS",
     dropzonePlaceholder: "Collez vos données produit textile ici...\n\nExemples:\n• Contenu d'email fournisseur\n• Extraction de texte PDF\n• Descriptions produit brutes\n• Fiches de composition matière",
     or: "OU",
