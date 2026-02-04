@@ -89,7 +89,7 @@ export function MagicDropzone({ onSubmit, isLoading }: MagicDropzoneProps) {
           <span className="bg-gradient-to-r from-sky-500 via-violet-500 to-sky-400 bg-clip-text text-transparent">
             Arianee
           </span>{" "}
-          <span className="text-slate-800">PCDS Cleaner</span>
+          <span className="text-slate-800">PCDS & AGEC Analyser</span>
         </h1>
         <p className="text-slate-500 text-sm max-w-md mx-auto">
           Drop any textile data — supplier emails, PDF content, raw descriptions

@@ -104,7 +104,7 @@ export function ScanningAnimation({ isActive, progress }: ScanningAnimationProps
                 animate={{ opacity: 1, y: 0 }}
                 className="text-2xl font-bold text-slate-800 mb-8 tracking-wide"
               >
-                <span className="text-sky-600">ARIANEE</span> PCDS ANALYSIS
+                <span className="text-sky-600">Arianee</span> PCDS & AGEC Analyser
                 {progress && (
                   <span className="block text-sm font-normal text-slate-500 mt-2">
                     Processing {progress.total} products...

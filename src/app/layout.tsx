@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Arianee PCDS Cleaner",
+  title: "Arianee PCDS & AGEC Analyser",
   description: "Textile compliance analysis — ISO 59040 + AGEC",
 };
 
